@@ -8,6 +8,8 @@ const items = [
   { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
+type NavTo = (typeof items)[number]["to"];
+
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 

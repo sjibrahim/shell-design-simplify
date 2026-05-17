@@ -9,14 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WithdrawRouteImport } from './routes/withdraw'
+import { Route as TreasureBoxRouteImport } from './routes/treasure-box'
 import { Route as TeamRouteImport } from './routes/team'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as MissionRouteImport } from './routes/mission'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as InviteRouteImport } from './routes/invite'
+import { Route as IncomeDetailsRouteImport } from './routes/income-details'
+import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WithdrawRoute = WithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TreasureBoxRoute = TreasureBoxRouteImport.update({
+  id: '/treasure-box',
+  path: '/treasure-box',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RechargeRoute = RechargeRouteImport.update({
+  id: '/recharge',
+  path: '/recharge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -24,9 +52,29 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MissionRoute = MissionRouteImport.update({
+  id: '/mission',
+  path: '/mission',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InviteRoute = InviteRouteImport.update({
   id: '/invite',
   path: '/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncomeDetailsRoute = IncomeDetailsRouteImport.update({
+  id: '/income-details',
+  path: '/income-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChannelRoute = ChannelRouteImport.update({
+  id: '/channel',
+  path: '/channel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,45 +85,142 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/channel': typeof ChannelRoute
+  '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
+  '/login': typeof LoginRoute
+  '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
+  '/recharge': typeof RechargeRoute
+  '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/treasure-box': typeof TreasureBoxRoute
+  '/withdraw': typeof WithdrawRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/channel': typeof ChannelRoute
+  '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
+  '/login': typeof LoginRoute
+  '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
+  '/recharge': typeof RechargeRoute
+  '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/treasure-box': typeof TreasureBoxRoute
+  '/withdraw': typeof WithdrawRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/channel': typeof ChannelRoute
+  '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
+  '/login': typeof LoginRoute
+  '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
+  '/recharge': typeof RechargeRoute
+  '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/treasure-box': typeof TreasureBoxRoute
+  '/withdraw': typeof WithdrawRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/invite' | '/profile' | '/team'
+  fullPaths:
+    | '/'
+    | '/channel'
+    | '/income-details'
+    | '/invite'
+    | '/login'
+    | '/mission'
+    | '/profile'
+    | '/recharge'
+    | '/register'
+    | '/team'
+    | '/treasure-box'
+    | '/withdraw'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/invite' | '/profile' | '/team'
-  id: '__root__' | '/' | '/invite' | '/profile' | '/team'
+  to:
+    | '/'
+    | '/channel'
+    | '/income-details'
+    | '/invite'
+    | '/login'
+    | '/mission'
+    | '/profile'
+    | '/recharge'
+    | '/register'
+    | '/team'
+    | '/treasure-box'
+    | '/withdraw'
+  id:
+    | '__root__'
+    | '/'
+    | '/channel'
+    | '/income-details'
+    | '/invite'
+    | '/login'
+    | '/mission'
+    | '/profile'
+    | '/recharge'
+    | '/register'
+    | '/team'
+    | '/treasure-box'
+    | '/withdraw'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChannelRoute: typeof ChannelRoute
+  IncomeDetailsRoute: typeof IncomeDetailsRoute
   InviteRoute: typeof InviteRoute
+  LoginRoute: typeof LoginRoute
+  MissionRoute: typeof MissionRoute
   ProfileRoute: typeof ProfileRoute
+  RechargeRoute: typeof RechargeRoute
+  RegisterRoute: typeof RegisterRoute
   TeamRoute: typeof TeamRoute
+  TreasureBoxRoute: typeof TreasureBoxRoute
+  WithdrawRoute: typeof WithdrawRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/withdraw': {
+      id: '/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof WithdrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/treasure-box': {
+      id: '/treasure-box'
+      path: '/treasure-box'
+      fullPath: '/treasure-box'
+      preLoaderRoute: typeof TreasureBoxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/team': {
       id: '/team'
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recharge': {
+      id: '/recharge'
+      path: '/recharge'
+      fullPath: '/recharge'
+      preLoaderRoute: typeof RechargeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -85,11 +230,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mission': {
+      id: '/mission'
+      path: '/mission'
+      fullPath: '/mission'
+      preLoaderRoute: typeof MissionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invite': {
       id: '/invite'
       path: '/invite'
       fullPath: '/invite'
       preLoaderRoute: typeof InviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/income-details': {
+      id: '/income-details'
+      path: '/income-details'
+      fullPath: '/income-details'
+      preLoaderRoute: typeof IncomeDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/channel': {
+      id: '/channel'
+      path: '/channel'
+      fullPath: '/channel'
+      preLoaderRoute: typeof ChannelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,9 +277,17 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChannelRoute: ChannelRoute,
+  IncomeDetailsRoute: IncomeDetailsRoute,
   InviteRoute: InviteRoute,
+  LoginRoute: LoginRoute,
+  MissionRoute: MissionRoute,
   ProfileRoute: ProfileRoute,
+  RechargeRoute: RechargeRoute,
+  RegisterRoute: RegisterRoute,
   TeamRoute: TeamRoute,
+  TreasureBoxRoute: TreasureBoxRoute,
+  WithdrawRoute: WithdrawRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
