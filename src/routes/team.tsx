@@ -1,155 +1,254 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Users, CreditCard } from "lucide-react";
+import {
+  Users,
+  TrendingUp,
+  Share2,
+  Copy,
+  Check,
+  ChevronRight,
+  Crown,
+  Sparkles,
+} from "lucide-react";
 import { PageShell } from "@/components/PageShell";
-import { GradientHeader } from "@/components/GradientHeader";
-import shellLogo from "@/assets/shell-logo.png";
 
 export const Route = createFileRoute("/team")({
+  head: () => ({
+    meta: [
+      { title: "My Team — Shell Oil" },
+      { name: "description", content: "Track your Shell Oil referral network across 3 levels." },
+    ],
+  }),
   component: TeamPage,
 });
 
+const REFERRAL_CODE = "SHL821047";
+
 const levels = [
-  { key: "1", label: "Lv1", count: 7, earn: "₱500", color: "bg-shell-amber" },
-  { key: "2", label: "Lv2", count: 14, earn: "₱0", color: "bg-shell-red" },
-  { key: "3", label: "Lv3", count: 134, earn: "₱21,765", color: "bg-shell-red-dark" },
+  {
+    key: "1",
+    label: "Level 1",
+    badge: "Direct",
+    count: 7,
+    earn: "₱500",
+    rate: "10%",
+    color: "from-shell-amber to-[#d98a14]",
+    chipBg: "bg-shell-amber/15 text-shell-amber",
+  },
+  {
+    key: "2",
+    label: "Level 2",
+    badge: "Indirect",
+    count: 14,
+    earn: "₱0",
+    rate: "5%",
+    color: "from-shell-red to-shell-red-dark",
+    chipBg: "bg-shell-red/10 text-shell-red",
+  },
+  {
+    key: "3",
+    label: "Level 3",
+    badge: "Network",
+    count: 134,
+    earn: "₱21,765",
+    rate: "2%",
+    color: "from-[#7a0d10] to-[#4a0608]",
+    chipBg: "bg-shell-red-dark/15 text-shell-red-dark",
+  },
 ] as const;
 
-const membersByLevel: Record<string, { phone: string; date: string; recharge: string; withdraw: string }[]> = {
+type LvKey = (typeof levels)[number]["key"];
+
+const membersByLevel: Record<LvKey, { name: string; phone: string; date: string; recharge: string; withdraw: string; status: "active" | "new" | "idle" }[]> = {
   "1": [
-    { phone: "999****996", date: "13 May 2026, 08:16 PM", recharge: "₱0.00", withdraw: "₱0.00" },
-    { phone: "999****997", date: "13 May 2026, 08:16 PM", recharge: "₱500.00", withdraw: "₱120.00" },
-    { phone: "917****221", date: "12 May 2026, 04:02 PM", recharge: "₱0.00", withdraw: "₱0.00" },
+    { name: "Juan S.",   phone: "+63 917 ***4996", date: "13 May, 08:16 PM", recharge: "₱0.00",      withdraw: "₱0.00",   status: "idle" },
+    { name: "Maria R.",  phone: "+63 918 ***7221", date: "13 May, 08:16 PM", recharge: "₱500.00",    withdraw: "₱120.00", status: "active" },
+    { name: "Carlo M.",  phone: "+63 920 ***0114", date: "12 May, 04:02 PM", recharge: "₱0.00",      withdraw: "₱0.00",   status: "new" },
   ],
   "2": [
-    { phone: "923****118", date: "10 May 2026, 09:31 AM", recharge: "₱1,200.00", withdraw: "₱300.00" },
-    { phone: "918****452", date: "09 May 2026, 06:14 PM", recharge: "₱0.00", withdraw: "₱0.00" },
+    { name: "Joy D.",    phone: "+63 923 ***8118", date: "10 May, 09:31 AM", recharge: "₱1,200.00",  withdraw: "₱300.00", status: "active" },
+    { name: "Paolo L.",  phone: "+63 918 ***4452", date: "09 May, 06:14 PM", recharge: "₱0.00",      withdraw: "₱0.00",   status: "idle" },
   ],
   "3": [
-    { phone: "920****007", date: "08 May 2026, 11:45 AM", recharge: "₱8,400.00", withdraw: "₱2,100.00" },
-    { phone: "915****889", date: "07 May 2026, 03:22 PM", recharge: "₱13,365.00", withdraw: "₱4,200.00" },
+    { name: "Reyna T.",  phone: "+63 920 ***0007", date: "08 May, 11:45 AM", recharge: "₱8,400.00",  withdraw: "₱2,100.00", status: "active" },
+    { name: "Andres B.", phone: "+63 915 ***8899", date: "07 May, 03:22 PM", recharge: "₱13,365.00", withdraw: "₱4,200.00", status: "active" },
   ],
 };
 
+const statusStyle: Record<"active" | "new" | "idle", string> = {
+  active: "bg-shell-green/15 text-shell-green",
+  new: "bg-shell-yellow/30 text-shell-red-dark",
+  idle: "bg-muted text-muted-foreground",
+};
+
 function TeamPage() {
-  const [active, setActive] = useState<"1" | "2" | "3">("1");
+  const [active, setActive] = useState<LvKey>("1");
+  const [copied, setCopied] = useState(false);
   const members = membersByLevel[active];
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(REFERRAL_CODE);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  const totalMembers = levels.reduce((sum, lv) => sum + lv.count, 0);
+  const totalEarned = "₱22,265";
 
   return (
     <PageShell>
-      <GradientHeader>
-        <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-            <Users size={28} className="text-white" strokeWidth={2.2} />
-          </div>
+      {/* Header */}
+      <header className="relative overflow-hidden rounded-b-[2.5rem] bg-[linear-gradient(135deg,#DD1D21_0%,#A8161A_100%)] px-5 pb-28 pt-6 text-white">
+        <span className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full bg-white/10" />
+        <span className="pointer-events-none absolute -left-12 bottom-0 h-44 w-44 rounded-full bg-shell-yellow/10" />
+        <div className="relative flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">My Team</h1>
-            <p className="mt-1 text-sm text-white/80">Track your referral network & earnings</p>
+            <div className="text-[11px] font-bold tracking-[0.25em] text-shell-yellow">MY TEAM</div>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Your Network</h1>
+          </div>
+          <button
+            onClick={copy}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur transition active:scale-95"
+            aria-label="Share referral code"
+          >
+            <Share2 size={20} />
+          </button>
+        </div>
+
+        {/* Hero stats */}
+        <div className="relative mt-6 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-white/15 p-3 backdrop-blur">
+            <div className="flex items-center gap-2 text-[10px] font-bold tracking-wider text-white/80">
+              <Users size={12} /> TOTAL MEMBERS
+            </div>
+            <div className="mt-1 text-2xl font-extrabold">{totalMembers}</div>
+          </div>
+          <div className="rounded-2xl bg-white/15 p-3 backdrop-blur">
+            <div className="flex items-center gap-2 text-[10px] font-bold tracking-wider text-white/80">
+              <TrendingUp size={12} /> TOTAL EARNED
+            </div>
+            <div className="mt-1 text-2xl font-extrabold text-shell-yellow">{totalEarned}</div>
           </div>
         </div>
-      </GradientHeader>
+      </header>
 
-      <main className="relative z-10 -mt-10 space-y-5 px-4">
-        {/* Top stats */}
-        <section className="grid grid-cols-2 gap-3">
-          <div className="rounded-3xl bg-white p-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-shell-red/10 text-shell-red">
-                <Users size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold tracking-wider text-muted-foreground">TOTAL TEAM</div>
-                <div className="text-xl font-extrabold">155</div>
-              </div>
+      <main className="relative z-10 -mt-16 space-y-5 px-4">
+        {/* Referral code card */}
+        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-shell-yellow via-[#FFE066] to-shell-yellow p-[2px] shadow-[0_10px_40px_-12px_rgba(255,213,0,0.5)]">
+          <div className="flex items-center gap-3 rounded-[calc(1.5rem-2px)] bg-white px-4 py-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-shell-red to-shell-red-dark text-white">
+              <Sparkles size={20} />
             </div>
-          </div>
-          <div className="rounded-3xl bg-white p-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-shell-amber/15 text-shell-amber">
-                <CreditCard size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold tracking-wider text-muted-foreground">T RECHARGE</div>
-                <div className="text-xl font-extrabold">₱22,265</div>
-              </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold tracking-wider text-muted-foreground">YOUR REFERRAL CODE</div>
+              <div className="truncate text-lg font-extrabold tracking-wider text-foreground">{REFERRAL_CODE}</div>
             </div>
+            <button
+              onClick={copy}
+              className="flex items-center gap-1.5 rounded-xl bg-shell-red px-3.5 py-2.5 text-xs font-bold text-white transition active:scale-95"
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              {copied ? "Copied" : "Copy"}
+            </button>
           </div>
         </section>
 
-        {/* Level breakdown */}
-        <section className="overflow-hidden rounded-3xl bg-white pb-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
-          <div className="grid grid-cols-3 divide-x divide-border">
-            {levels.map((lv) => (
-              <div key={lv.key} className="px-3 pt-0 text-center">
-                <div className={`mx-auto -mt-0 mb-3 w-fit rounded-b-2xl px-5 py-1.5 text-white shadow ${lv.color}`}>
-                  <span className="text-base font-extrabold">{lv.label}</span>
-                </div>
-                <div className="text-2xl font-extrabold text-foreground">{lv.count}</div>
-                <div className="mt-1 text-base font-bold text-shell-red">{lv.earn}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Team members */}
-        <section>
-          <div className="mb-3 flex items-center gap-2 px-1">
+        {/* Level cards */}
+        <section className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
             <span className="h-5 w-1 rounded-full bg-shell-red" />
-            <h2 className="text-lg font-extrabold text-foreground">Team Members</h2>
+            <h2 className="text-lg font-extrabold text-foreground">Commission Levels</h2>
           </div>
 
-          {/* Level tabs */}
-          <div className="mb-4 flex items-center gap-1 rounded-2xl bg-white p-1.5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.12)]">
-            {levels.map((lv) => {
-              const isActive = active === lv.key;
+          {levels.map((lv) => {
+            const isActive = active === lv.key;
+            return (
+              <button
+                key={lv.key}
+                onClick={() => setActive(lv.key)}
+                className={`group relative w-full overflow-hidden rounded-3xl bg-white text-left shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)] transition ${
+                  isActive ? "ring-2 ring-shell-red" : "ring-1 ring-transparent"
+                }`}
+              >
+                <div className="flex items-stretch">
+                  <div className={`flex w-24 shrink-0 flex-col items-center justify-center gap-1 bg-gradient-to-br ${lv.color} px-2 py-4 text-white`}>
+                    <Crown size={18} className="opacity-80" />
+                    <div className="text-xs font-bold tracking-wider opacity-90">{lv.label.toUpperCase()}</div>
+                    <div className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold">{lv.rate}</div>
+                  </div>
+                  <div className="flex flex-1 items-center gap-3 px-4 py-3">
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <div className="text-2xl font-extrabold text-foreground">{lv.count}</div>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${lv.chipBg}`}>
+                          {lv.badge}
+                        </span>
+                      </div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        Earned <span className="font-extrabold text-shell-red">{lv.earn}</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className={`shrink-0 transition ${isActive ? "text-shell-red" : "text-muted-foreground"}`} />
+                  </div>
+                </div>
+                {isActive && <span className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-shell-red via-shell-yellow to-shell-red" />}
+              </button>
+            );
+          })}
+        </section>
+
+        {/* Members for active level */}
+        <section className="space-y-3 pb-4">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <span className="h-5 w-1 rounded-full bg-shell-red" />
+              <h2 className="text-lg font-extrabold text-foreground">
+                {levels.find((l) => l.key === active)?.label} Members
+              </h2>
+            </div>
+            <span className="rounded-full bg-shell-red/10 px-2.5 py-1 text-xs font-bold text-shell-red">
+              {members.length}
+            </span>
+          </div>
+
+          <div className="space-y-2.5">
+            {members.map((m) => {
+              const initials = m.name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
               return (
-                <button
-                  key={lv.key}
-                  onClick={() => setActive(lv.key as "1" | "2" | "3")}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition ${
-                    isActive ? "bg-shell-red text-white shadow" : "text-muted-foreground"
-                  }`}
+                <article
+                  key={m.phone}
+                  className="overflow-hidden rounded-2xl bg-white shadow-[0_6px_20px_-12px_rgba(221,29,33,0.18)]"
                 >
-                  Level {lv.key}
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      isActive ? "bg-white/20 text-white" : "bg-shell-red/10 text-shell-red"
-                    }`}
-                  >
-                    {lv.count}
-                  </span>
-                </button>
+                  <div className="flex items-center gap-3 px-3.5 py-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-shell-red to-shell-red-dark text-sm font-extrabold text-white">
+                      {initials}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-sm font-extrabold text-foreground">{m.name}</span>
+                        <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusStyle[m.status]}`}>
+                          {m.status}
+                        </span>
+                      </div>
+                      <div className="truncate text-xs text-muted-foreground">{m.phone}</div>
+                      <div className="text-[10px] text-muted-foreground">{m.date}</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 divide-x divide-border bg-secondary/30 py-2.5 text-center">
+                    <div>
+                      <div className="text-[9px] font-bold tracking-wider text-muted-foreground">RECHARGE</div>
+                      <div className="text-sm font-extrabold text-shell-green">{m.recharge}</div>
+                    </div>
+                    <div>
+                      <div className="text-[9px] font-bold tracking-wider text-muted-foreground">WITHDRAW</div>
+                      <div className="text-sm font-extrabold text-shell-amber">{m.withdraw}</div>
+                    </div>
+                  </div>
+                </article>
               );
             })}
-          </div>
-
-          <div className="space-y-3">
-            {members.map((m) => (
-              <div
-                key={m.phone}
-                className="overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_-12px_rgba(221,29,33,0.12)]"
-              >
-                <div className="flex items-center gap-3 px-4 py-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-shell-yellow/30 p-1">
-                    <img src={shellLogo} alt="" className="h-full w-full object-contain" width={48} height={48} loading="lazy" />
-                  </div>
-                  <div>
-                    <div className="text-base font-extrabold">{m.phone}</div>
-                    <div className="text-sm text-muted-foreground">{m.date}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 divide-x divide-border border-t border-border py-3 text-center">
-                  <div>
-                    <div className="text-[10px] font-bold tracking-wider text-muted-foreground">TOTAL RECHARGE</div>
-                    <div className="text-base font-extrabold text-shell-green">{m.recharge}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-bold tracking-wider text-muted-foreground">TOTAL WITHDRAW</div>
-                    <div className="text-base font-extrabold text-shell-amber">{m.withdraw}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
       </main>
