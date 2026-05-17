@@ -115,12 +115,12 @@ export function ActivityPopup() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center px-3 sm:bottom-6 sm:left-4 sm:right-auto sm:justify-start sm:px-0"
+      className="pointer-events-none fixed inset-x-0 top-3 z-[60] flex justify-center px-3 sm:top-4 sm:left-4 sm:right-auto sm:justify-start sm:px-0"
       aria-live="polite"
     >
       <div
         className={`pointer-events-auto relative w-full max-w-[360px] overflow-hidden rounded-2xl bg-white shadow-[0_18px_50px_-12px_rgba(221,29,33,0.35)] ring-1 ${m.ring} transition-all duration-400 ease-out ${
-          visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          visible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
         }`}
       >
         <div className="flex items-center gap-3 p-3 pr-9">
