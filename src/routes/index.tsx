@@ -11,6 +11,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
+import { ActivityTicker } from "@/components/ActivityTicker";
 import shellLogo from "@/assets/shell-logo.png";
 import shellHero from "@/assets/shell-hero.jpg";
 import shellPlan from "@/assets/shell-plan.jpg";
@@ -187,6 +188,8 @@ function HomePage() {
             ))}
           </div>
         </section>
+
+        <ActivityTicker kind="purchase" />
       </main>
     </PageShell>
   );
