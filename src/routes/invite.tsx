@@ -43,7 +43,7 @@ function InvitePage() {
         </div>
       </GradientHeader>
 
-      <main className="-mt-10 space-y-5 px-4">
+      <main className="relative z-10 -mt-10 space-y-5 px-4">
         {/* Stats */}
         <section className="grid grid-cols-3 gap-3">
           {stats.map((s) => (

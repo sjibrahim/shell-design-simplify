@@ -70,7 +70,7 @@ function HomePage() {
         </div>
       </header>
 
-      <main className="-mt-16 space-y-5 px-4">
+      <main className="relative z-10 -mt-16 space-y-5 px-4">
         {/* Hero banner */}
         <section className="overflow-hidden rounded-3xl shadow-[0_10px_40px_-10px_rgba(221,29,33,0.25)]">
           <div className="relative aspect-[16/9] w-full">
