@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Users, CreditCard } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { GradientHeader } from "@/components/GradientHeader";
-import { ActivityTicker } from "@/components/ActivityTicker";
 import shellLogo from "@/assets/shell-logo.png";
 
 export const Route = createFileRoute("/team")({
@@ -153,8 +152,6 @@ function TeamPage() {
             ))}
           </div>
         </section>
-
-        <ActivityTicker kind="invite" />
       </main>
     </PageShell>
   );

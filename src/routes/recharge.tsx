@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Wallet } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
-import { ActivityTicker } from "@/components/ActivityTicker";
 
 export const Route = createFileRoute("/recharge")({
   head: () => ({ meta: [{ title: "Recharge — Shell Oil" }] }),
@@ -30,7 +29,6 @@ export const Route = createFileRoute("/recharge")({
             Continue
           </button>
         </div>
-        <ActivityTicker kind="recharge" />
       </section>
     </SubPage>
   ),
