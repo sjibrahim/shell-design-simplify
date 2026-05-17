@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WithdrawRouteImport } from './routes/withdraw'
 import { Route as TreasureBoxRouteImport } from './routes/treasure-box'
+import { Route as TestHeadersRouteImport } from './routes/test-headers'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RechargeRouteImport } from './routes/recharge'
@@ -30,6 +31,11 @@ const WithdrawRoute = WithdrawRouteImport.update({
 const TreasureBoxRoute = TreasureBoxRouteImport.update({
   id: '/treasure-box',
   path: '/treasure-box',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestHeadersRoute = TestHeadersRouteImport.update({
+  id: '/test-headers',
+  path: '/test-headers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeamRoute = TeamRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/recharge': typeof RechargeRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/test-headers': typeof TestHeadersRoute
   '/treasure-box': typeof TreasureBoxRoute
   '/withdraw': typeof WithdrawRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/recharge': typeof RechargeRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/test-headers': typeof TestHeadersRoute
   '/treasure-box': typeof TreasureBoxRoute
   '/withdraw': typeof WithdrawRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/recharge': typeof RechargeRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/test-headers': typeof TestHeadersRoute
   '/treasure-box': typeof TreasureBoxRoute
   '/withdraw': typeof WithdrawRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/recharge'
     | '/register'
     | '/team'
+    | '/test-headers'
     | '/treasure-box'
     | '/withdraw'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/recharge'
     | '/register'
     | '/team'
+    | '/test-headers'
     | '/treasure-box'
     | '/withdraw'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/recharge'
     | '/register'
     | '/team'
+    | '/test-headers'
     | '/treasure-box'
     | '/withdraw'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   RechargeRoute: typeof RechargeRoute
   RegisterRoute: typeof RegisterRoute
   TeamRoute: typeof TeamRoute
+  TestHeadersRoute: typeof TestHeadersRoute
   TreasureBoxRoute: typeof TreasureBoxRoute
   WithdrawRoute: typeof WithdrawRoute
 }
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/treasure-box'
       fullPath: '/treasure-box'
       preLoaderRoute: typeof TreasureBoxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-headers': {
+      id: '/test-headers'
+      path: '/test-headers'
+      fullPath: '/test-headers'
+      preLoaderRoute: typeof TestHeadersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/team': {
@@ -286,9 +306,20 @@ const rootRouteChildren: RootRouteChildren = {
   RechargeRoute: RechargeRoute,
   RegisterRoute: RegisterRoute,
   TeamRoute: TeamRoute,
+  TestHeadersRoute: TestHeadersRoute,
   TreasureBoxRoute: TreasureBoxRoute,
   WithdrawRoute: WithdrawRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
