@@ -2,17 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Users, CreditCard } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
-import { GradientHeader } from "@/components/GradientHeader";
-import shellLogo from "@/assets/shell-logo.png";
+import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/team")({
+  head: () => ({ meta: [{ title: "My Team — Shell Oil" }] }),
   component: TeamPage,
 });
 
 const levels = [
-  { key: "1", label: "Lv1", count: 7, earn: "₱500", color: "bg-shell-amber" },
-  { key: "2", label: "Lv2", count: 14, earn: "₱0", color: "bg-shell-red" },
-  { key: "3", label: "Lv3", count: 134, earn: "₱21,765", color: "bg-shell-red-dark" },
+  { key: "1", label: "Lv1", count: 7, earn: "₱500" },
+  { key: "2", label: "Lv2", count: 14, earn: "₱0" },
+  { key: "3", label: "Lv3", count: 134, earn: "₱21,765" },
 ] as const;
 
 const membersByLevel: Record<string, { phone: string; date: string; recharge: string; withdraw: string }[]> = {
@@ -37,55 +37,30 @@ function TeamPage() {
 
   return (
     <PageShell>
-      <GradientHeader>
-        <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-            <Users size={28} className="text-white" strokeWidth={2.2} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">My Team</h1>
-            <p className="mt-1 text-sm text-white/80">Track your referral network & earnings</p>
-          </div>
-        </div>
-      </GradientHeader>
+      <AppHeader
+        eyebrow="Network"
+        title="My Team"
+        subtitle="Track your referral network & earnings"
+        icon={<Users size={22} />}
+      />
 
-      <main className="-mt-10 space-y-5 px-4">
+      <main className="space-y-5 px-4 pt-5">
         {/* Top stats */}
         <section className="grid grid-cols-2 gap-3">
-          <div className="rounded-3xl bg-white p-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-shell-red/10 text-shell-red">
-                <Users size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold tracking-wider text-muted-foreground">TOTAL TEAM</div>
-                <div className="text-xl font-extrabold">155</div>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-3xl bg-white p-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-shell-amber/15 text-shell-amber">
-                <CreditCard size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold tracking-wider text-muted-foreground">T RECHARGE</div>
-                <div className="text-xl font-extrabold">₱22,265</div>
-              </div>
-            </div>
-          </div>
+          <StatTile label="Total Team" value="155" icon={<Users size={18} />} accent="yellow" />
+          <StatTile label="T Recharge" value="₱22,265" icon={<CreditCard size={18} />} accent="red" />
         </section>
 
         {/* Level breakdown */}
-        <section className="overflow-hidden rounded-3xl bg-white pb-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
-          <div className="grid grid-cols-3 divide-x divide-border">
+        <section className="rounded-2xl border border-shell-ink/10 bg-white">
+          <div className="grid grid-cols-3 divide-x divide-shell-ink/10">
             {levels.map((lv) => (
-              <div key={lv.key} className="px-3 pt-0 text-center">
-                <div className={`mx-auto -mt-0 mb-3 w-fit rounded-b-2xl px-5 py-1.5 text-white shadow ${lv.color}`}>
-                  <span className="text-base font-extrabold">{lv.label}</span>
+              <div key={lv.key} className="px-3 py-4 text-center">
+                <div className="mx-auto inline-block rounded-md bg-shell-ink px-3 py-1 text-xs font-extrabold text-shell-yellow">
+                  {lv.label}
                 </div>
-                <div className="text-2xl font-extrabold text-foreground">{lv.count}</div>
-                <div className="mt-1 text-base font-bold text-shell-red">{lv.earn}</div>
+                <div className="mt-2 text-2xl font-extrabold text-shell-ink">{lv.count}</div>
+                <div className="text-sm font-bold text-shell-red">{lv.earn}</div>
               </div>
             ))}
           </div>
@@ -93,27 +68,23 @@ function TeamPage() {
 
         {/* Team members */}
         <section>
-          <div className="mb-3 flex items-center gap-2 px-1">
-            <span className="h-5 w-1 rounded-full bg-shell-red" />
-            <h2 className="text-lg font-extrabold text-foreground">Team Members</h2>
-          </div>
+          <SectionTitle>Team Members</SectionTitle>
 
-          {/* Level tabs */}
-          <div className="mb-4 flex items-center gap-1 rounded-2xl bg-white p-1.5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.12)]">
+          <div className="mb-4 flex items-center gap-0 overflow-hidden rounded-xl border border-shell-ink/10 bg-white">
             {levels.map((lv) => {
               const isActive = active === lv.key;
               return (
                 <button
                   key={lv.key}
                   onClick={() => setActive(lv.key as "1" | "2" | "3")}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition ${
-                    isActive ? "bg-shell-red text-white shadow" : "text-muted-foreground"
+                  className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-extrabold transition ${
+                    isActive ? "bg-shell-ink text-shell-yellow" : "text-shell-ink/60"
                   }`}
                 >
-                  Level {lv.key}
+                  Lv {lv.key}
                   <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      isActive ? "bg-white/20 text-white" : "bg-shell-red/10 text-shell-red"
+                    className={`rounded px-1.5 text-[11px] ${
+                      isActive ? "bg-shell-yellow/20 text-shell-yellow" : "bg-shell-ink/5 text-shell-ink/60"
                     }`}
                   >
                     {lv.count}
@@ -127,25 +98,25 @@ function TeamPage() {
             {members.map((m) => (
               <div
                 key={m.phone}
-                className="overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_-12px_rgba(221,29,33,0.12)]"
+                className="overflow-hidden rounded-2xl border-l-4 border-shell-yellow bg-white shadow-sm"
               >
-                <div className="flex items-center gap-3 px-4 py-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-shell-yellow/30 p-1">
-                    <img src={shellLogo} alt="" className="h-full w-full object-contain" width={48} height={48} loading="lazy" />
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-shell-ink text-shell-yellow font-extrabold">
+                    {m.phone.slice(-3)}
                   </div>
                   <div>
-                    <div className="text-base font-extrabold">{m.phone}</div>
-                    <div className="text-sm text-muted-foreground">{m.date}</div>
+                    <div className="text-[15px] font-extrabold text-shell-ink">{m.phone}</div>
+                    <div className="text-xs text-shell-ink/55">{m.date}</div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 divide-x divide-border border-t border-border py-3 text-center">
+                <div className="grid grid-cols-2 divide-x divide-shell-ink/5 border-t border-shell-ink/5 py-2.5 text-center">
                   <div>
-                    <div className="text-[10px] font-bold tracking-wider text-muted-foreground">TOTAL RECHARGE</div>
-                    <div className="text-base font-extrabold text-shell-green">{m.recharge}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-shell-ink/50">Recharge</div>
+                    <div className="text-sm font-extrabold text-shell-green">{m.recharge}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold tracking-wider text-muted-foreground">TOTAL WITHDRAW</div>
-                    <div className="text-base font-extrabold text-shell-amber">{m.withdraw}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-shell-ink/50">Withdraw</div>
+                    <div className="text-sm font-extrabold text-shell-amber">{m.withdraw}</div>
                   </div>
                 </div>
               </div>
@@ -154,5 +125,38 @@ function TeamPage() {
         </section>
       </main>
     </PageShell>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  icon,
+  accent,
+}: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  accent: "yellow" | "red";
+}) {
+  const ring = accent === "yellow" ? "border-shell-yellow" : "border-shell-red";
+  const dot = accent === "yellow" ? "bg-shell-yellow text-shell-ink" : "bg-shell-red text-white";
+  return (
+    <div className={`rounded-2xl border-l-4 ${ring} bg-white p-4 shadow-sm`}>
+      <div className="flex items-center gap-2">
+        <span className={`flex h-7 w-7 items-center justify-center rounded-md ${dot}`}>{icon}</span>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-shell-ink/55">{label}</div>
+      </div>
+      <div className="mt-2 text-2xl font-extrabold text-shell-ink">{value}</div>
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-3 flex items-center gap-2 px-1">
+      <span className="h-4 w-1 rounded-full bg-shell-red" />
+      <h2 className="text-xs font-extrabold uppercase tracking-[0.2em] text-shell-ink/70">{children}</h2>
+    </div>
   );
 }
