@@ -31,6 +31,9 @@
   --color-shell-red-dark: var(--shell-red-dark);
   --color-shell-yellow: var(--shell-yellow);
   --color-shell-yellow-soft: var(--shell-yellow-soft);
+  --color-shell-ink: var(--shell-ink);
+  --color-shell-ink-soft: var(--shell-ink-soft);
+  --color-shell-cream: var(--shell-cream);
   --color-shell-green: var(--shell-green);
   --color-shell-amber: var(--shell-amber);
 }
@@ -54,12 +57,15 @@
   --input: oklch(0.92 0.02 80);
   --ring: oklch(0.58 0.22 27);
 
-  --shell-red: #DD1D21;
-  --shell-red-dark: #A8161A;
-  --shell-yellow: #FFD500;
-  --shell-yellow-soft: #FFF3B0;
-  --shell-green: #1FAA59;
-  --shell-amber: #F5A623;
+  --shell-red: #E1251B;
+  --shell-red-dark: #B11519;
+  --shell-yellow: #FFCC00;
+  --shell-yellow-soft: #FFF1A8;
+  --shell-ink: #15181F;
+  --shell-ink-soft: #20242E;
+  --shell-cream: #FBF6EA;
+  --shell-green: #2BB673;
+  --shell-amber: #F0A500;
 }
 
 @layer base {
