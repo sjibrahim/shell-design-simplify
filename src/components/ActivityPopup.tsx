@@ -133,8 +133,8 @@ export function ActivityPopup() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 truncate text-sm font-extrabold text-foreground">
               <span className="truncate">{toast.name}</span>
-              <span className="text-base leading-none">{toast.country.flag}</span>
-              <span className="text-[10px] font-bold text-muted-foreground">· {toast.country.code}</span>
+              <span className="text-base leading-none">🇵🇭</span>
+              <span className="text-[10px] font-bold text-muted-foreground">· {toast.city}</span>
             </div>
             <div className="truncate text-xs text-muted-foreground">
               {toast.action}
