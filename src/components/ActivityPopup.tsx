@@ -23,19 +23,19 @@ type Toast = {
   name: string;
   action: string;
   amount?: string;
-  country: { code: string; flag: string };
+  city: string;
   minsAgo: number;
 };
 
 let _id = 0;
 function makeToast(): Toast {
   const kind: Kind = pick(["purchase", "purchase", "recharge", "recharge", "invite"] as const);
-  const country = pick(COUNTRIES);
+  const city = pick(CITIES);
   const minsAgo = 1 + Math.floor(Math.random() * 12);
   _id += 1;
   if (kind === "purchase") {
     return {
-      id: _id, kind, country, minsAgo,
+      id: _id, kind, city, minsAgo,
       name: `${pick(FIRST)} ${pick(LAST)}`,
       action: `just purchased ${pick(PLANS)}`,
       amount: `₱${pick(PURCHASE).toLocaleString()}`,
@@ -43,14 +43,14 @@ function makeToast(): Toast {
   }
   if (kind === "recharge") {
     return {
-      id: _id, kind, country, minsAgo,
+      id: _id, kind, city, minsAgo,
       name: `${pick(FIRST)} ${pick(LAST)}`,
       action: `recharged wallet`,
       amount: `₱${pick(RECHARGE).toLocaleString()}`,
     };
   }
   return {
-    id: _id, kind, country, minsAgo,
+    id: _id, kind, city, minsAgo,
     name: maskedPhone(),
     action: `just joined Shell Oil`,
   };
