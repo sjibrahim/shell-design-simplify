@@ -3,21 +3,19 @@ import { ShoppingCart, Wallet, UserPlus, BadgeCheck, X } from "lucide-react";
 
 type Kind = "purchase" | "recharge" | "invite";
 
-const FIRST = ["Juan","Maria","Jose","Anna","Mark","Liza","Paolo","Grace","Ravi","Aisha","Wei","Mei","Carlo","Joy","Noor","Sami","Ken","Lyn","Reyna","Eli","Tariq","Bea","Diego","Fatima","Hassan","Ivy","Kai","Luna","Omar","Rina"];
-const LAST = ["S.","R.","M.","C.","L.","D.","T.","P.","B.","K.","G.","F.","V.","A.","N."];
+const FIRST = ["Juan","Maria","Jose","Ana","Mark","Liza","Paolo","Grace","Carlo","Joy","Reyna","Andres","Bea","Diego","Aira","Kim","Angelo","Trisha","Miguel","Jasmin","Rico","Cherry","Lance","Nica","Renz","Kris","Daryl","Mae","Patrick","Sheryl"];
+const LAST = ["Santos","Reyes","Cruz","Garcia","Bautista","Dela Cruz","Mendoza","Aquino","Ramos","Torres","Castillo","Villanueva","Gonzales","Rivera","Domingo","Navarro","Pascual","Lim","Tan","Aguilar"];
 const PLANS = ["Plan 1","Plan 2","Plan 3","Plan 4","VIP 1","VIP 2"];
 const RECHARGE = [200,350,500,800,1000,1500,2000,2500,3500,5000,7500,10000];
 const PURCHASE = [250,500,1000,2500,5000,10000];
-const COUNTRIES: { code: string; flag: string }[] = [
-  { code: "PH", flag: "🇵🇭" }, { code: "ID", flag: "🇮🇩" }, { code: "MY", flag: "🇲🇾" },
-  { code: "VN", flag: "🇻🇳" }, { code: "TH", flag: "🇹🇭" }, { code: "SG", flag: "🇸🇬" },
-  { code: "IN", flag: "🇮🇳" }, { code: "PK", flag: "🇵🇰" }, { code: "BD", flag: "🇧🇩" },
-  { code: "AE", flag: "🇦🇪" }, { code: "EG", flag: "🇪🇬" },
-];
+const CITIES = ["Manila","Quezon City","Cebu","Davao","Makati","Pasig","Taguig","Iloilo","Bacolod","Cagayan de Oro","Zamboanga","Baguio","Caloocan","Las Piñas","Parañaque"];
 
 const pick = <T,>(a: readonly T[]) => a[Math.floor(Math.random() * a.length)];
-const maskedPhone = () =>
-  `${900 + Math.floor(Math.random() * 100)}****${(1000 + Math.floor(Math.random() * 9000)).toString().slice(-3)}`;
+const maskedPhone = () => {
+  const prefix = pick(["917","918","919","920","921","927","935","939","945","949","963","966","977","995"]);
+  const tail = (1000 + Math.floor(Math.random() * 9000)).toString();
+  return `+63 ${prefix} ***${tail.slice(-4)}`;
+};
 
 type Toast = {
   id: number;
