@@ -29,7 +29,6 @@ export const Route = createFileRoute("/recharge")({
             Continue
           </button>
         </div>
-        <ActivityTicker kind="recharge" />
       </section>
     </SubPage>
   ),
