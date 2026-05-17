@@ -49,7 +49,7 @@ function TeamPage() {
         </div>
       </GradientHeader>
 
-      <main className="-mt-10 space-y-5 px-4">
+      <main className="relative z-10 -mt-10 space-y-5 px-4">
         {/* Top stats */}
         <section className="grid grid-cols-2 gap-3">
           <div className="rounded-3xl bg-white p-4 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">

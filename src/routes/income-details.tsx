@@ -50,7 +50,7 @@ function IncomePage() {
           </div>
         </header>
 
-        <main className="-mt-12 space-y-6 px-4">
+        <main className="relative z-10 -mt-12 space-y-6 px-4">
           <section className="rounded-3xl bg-white p-6 text-center shadow-[0_10px_40px_-10px_rgba(221,29,33,0.2)]">
             <div className="flex items-center justify-center gap-2 text-shell-red">
               <span className="h-2.5 w-2.5 rounded-full bg-shell-green" />

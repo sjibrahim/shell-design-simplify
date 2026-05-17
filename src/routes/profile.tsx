@@ -50,7 +50,7 @@ function ProfilePage() {
         </div>
       </GradientHeader>
 
-      <main className="-mt-12 space-y-5 px-4">
+      <main className="relative z-10 -mt-12 space-y-5 px-4">
         {/* Stats card */}
         <section className="overflow-hidden rounded-3xl bg-white shadow-[0_10px_40px_-10px_rgba(221,29,33,0.18)]">
           <div className="grid grid-cols-3 divide-x divide-border px-2 py-5">

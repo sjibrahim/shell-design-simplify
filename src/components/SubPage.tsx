@@ -46,7 +46,7 @@ export function SubPage({
             </div>
           )}
         </header>
-        <main className="-mt-10 px-4">{children}</main>
+        <main className="relative z-10 -mt-10 px-4">{children}</main>
         {showBottomNav && <BottomNav />}
       </div>
     </div>
