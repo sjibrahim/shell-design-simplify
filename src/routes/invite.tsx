@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { MailPlus, CreditCard, Layers, Copy, Check } from "lucide-react";
+import { MailPlus, CreditCard, Layers, Copy, Check, Share2, MessageCircle, Send, Facebook, Sparkles, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { GradientHeader } from "@/components/GradientHeader";
 
