@@ -20,7 +20,38 @@ interface TeamStats { level: 1 | 2 | 3; count: number; commission: number | stri
 
 
 function TeamPage() {
+  const { user } = useAuth();
   const [copied, setCopied] = useState<"code" | "link" | null>(null);
+  const [stats, setStats] = useState<TeamStats[]>([]);
+
+  const REFERRAL_CODE = user?.referral_code || "—";
+  const REFERRAL_LINK = typeof window !== "undefined"
+    ? `${window.location.origin}/register?invite=${REFERRAL_CODE}`
+    : `/register?invite=${REFERRAL_CODE}`;
+
+  useEffect(() => {
+    if (!user) return;
+    uGet<{ ok: true; stats: TeamStats[] }>("/api/u/team")
+      .then((r) => setStats(r.stats || []))
+      .catch(() => setStats([]));
+  }, [user]);
+
+  const styleByLevel = [
+    { dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5",   rate: "15%", sub: "Direct invites" },
+    { dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5", rate: "8%",  sub: "Sub-team" },
+    { dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5", rate: "3%",  sub: "Extended" },
+  ];
+  const levels = [1, 2, 3].map((n) => {
+    const s = stats.find((x) => Number(x.level) === n);
+    const st = styleByLevel[n - 1];
+    return {
+      n, label: `Level ${n}`, sub: st.sub, rate: st.rate,
+      rebate: fmtPeso(s?.commission ?? 0),
+      qty: s?.count ?? 0,
+      dot: st.dot, ring: st.ring, tint: st.tint,
+    };
+  });
+
 
   const copy = async (text: string, what: "code" | "link") => {
     try {
