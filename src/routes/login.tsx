@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Lock, Eye, EyeOff, Building2 } from "lucide-react";
-import { AuthShell, FieldBox, PhoneField } from "@/components/AuthShell";
+import { Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { AuthShell, Field, PhoneInput, PrimaryButton } from "@/components/AuthShell";
 import { loginUser } from "@/lib/user-api";
 import { useAuth } from "@/lib/auth";
 
@@ -21,7 +21,6 @@ function LoginPage() {
   const [show, setShow] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -37,70 +36,53 @@ function LoginPage() {
   };
 
   return (
-    <AuthShell>
-      <h2 className="text-center text-[26px] font-extrabold text-shell-red">Welcome Back</h2>
-      <p className="mt-1 text-center text-[14px] text-muted-foreground">Please login to your account</p>
-
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to continue to your Shell account."
+      footer={
+        <p className="text-center text-[13px] text-foreground/70">
+          New here?{" "}
+          <Link to="/register" className="font-bold text-shell-red hover:underline">
+            Create an account
+          </Link>
+        </p>
+      }
+    >
       {err && (
-        <div className="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-[12.5px] font-semibold text-rose-700 ring-1 ring-rose-200">
+        <div className="mb-4 rounded-lg bg-rose-50 px-3 py-2 text-[12.5px] font-semibold text-rose-700 ring-1 ring-rose-200">
           {err}
         </div>
       )}
 
-      <form onSubmit={submit} className="mt-6 space-y-4">
-        <PhoneField value={phone} onChange={setPhone} />
+      <form onSubmit={submit} className="space-y-4">
+        <PhoneInput value={phone} onChange={setPhone} />
 
-        <FieldBox icon={<Lock size={20} className="text-shell-red" />}>
+        <Field label="Password" icon={<Lock size={16} />}>
           <input
             type={show ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            placeholder="••••••••"
             required
             autoComplete="current-password"
-            className="flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground/70"
           />
           <button type="button" onClick={() => setShow((s) => !s)} className="px-1 text-muted-foreground" aria-label="Toggle password">
             {show ? <Eye size={18} /> : <EyeOff size={18} />}
           </button>
-        </FieldBox>
+        </Field>
 
-        <div className="flex items-center justify-between pt-0.5">
-          <label className="inline-flex items-center gap-2 text-[13px] font-medium text-foreground/80">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
-              className="h-4 w-4 rounded border-border accent-shell-red"
-            />
-            Remember me
-          </label>
-          <button type="button" className="text-[13px] font-bold text-shell-red hover:underline">
-            Forgot Password?
+        <div className="flex justify-end pt-0.5">
+          <button type="button" className="text-[12.5px] font-semibold text-shell-red hover:underline">
+            Forgot password?
           </button>
         </div>
 
-        <button
-          disabled={loading}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-shell-red to-shell-red-dark py-4 text-[15px] font-extrabold tracking-[0.22em] text-white shadow-lg shadow-shell-red/30 transition active:scale-[0.99] disabled:opacity-60"
-        >
-          <Lock size={16} />
-          {loading ? "SIGNING IN…" : "LOGIN"}
-        </button>
-
-        <div className="flex items-center gap-3 py-1">
-          <span className="h-px flex-1 bg-border" />
-          <span className="text-[11px] font-bold tracking-[0.25em] text-muted-foreground">OR</span>
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <Link
-          to="/register"
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-shell-red bg-white py-4 text-[13.5px] font-extrabold tracking-[0.2em] text-shell-red transition hover:bg-shell-red/5"
-        >
-          <Building2 size={15} />
-          CREATE NEW ACCOUNT
-        </Link>
+        <PrimaryButton loading={loading}>
+          <span className="inline-flex items-center gap-2">
+            SIGN IN <ArrowRight size={14} />
+          </span>
+        </PrimaryButton>
       </form>
     </AuthShell>
   );

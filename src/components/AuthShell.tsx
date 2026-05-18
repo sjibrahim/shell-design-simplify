@@ -1,111 +1,102 @@
-import { User as UserIcon, ChevronDown } from "lucide-react";
 import shellLogo from "@/assets/shell-logo.png";
 
 /* =========================================================
-   AuthShell — mobile-first Shell-branded auth layout
-   Hero (red + cityscape) → wave → white card → wave → red footer
+   AuthShell — premium, mobile-first auth layout
+   Soft cream canvas · red arc brand mark · elegant card
    ========================================================= */
-export function AuthShell({ children }: { children: React.ReactNode }) {
+export function AuthShell({
+  title,
+  subtitle,
+  children,
+  footer,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
   return (
-    <div className="min-h-screen w-full bg-[#5a0c0f]">
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-[#5a0c0f]">
-        {/* HERO (compact) */}
-        <section className="relative overflow-hidden bg-[radial-gradient(120%_90%_at_50%_0%,#8a1216_0%,#6c0e12_55%,#4a0a0d_100%)] px-6 pb-10 pt-6 text-white">
-          <Cityscape />
-          <div className="relative flex flex-col items-center text-center">
-            <img src={shellLogo} alt="Shell" width={72} height={72} className="h-16 w-16 object-contain drop-shadow-[0_6px_18px_rgba(0,0,0,0.5)]" />
-            <h1 className="mt-2 text-[20px] font-extrabold leading-none tracking-[0.02em] text-white">
-              SHELL COMPANY
-            </h1>
-            <div className="mt-2 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.4em] text-shell-yellow">
-              <span className="h-px w-7 bg-shell-yellow" />
-              PHILIPPINES
-              <span className="h-px w-7 bg-shell-yellow" />
-            </div>
-          </div>
-          <Wave fill="#ffffff" />
-        </section>
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#FAF7F2]">
+      {/* Decorative red arc */}
+      <div
+        aria-hidden
+        className="absolute -top-40 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(60%_60%_at_50%_50%,#DD1D21_0%,#A8161A_55%,#5a0c0f_100%)] shadow-[0_30px_80px_-30px_rgba(168,22,26,0.55)]"
+      />
+      <div
+        aria-hidden
+        className="absolute -top-24 left-1/2 h-2 w-[680px] -translate-x-1/2 rounded-full bg-shell-yellow/80 blur-[2px]"
+      />
 
-        {/* WHITE CARD — pulled up */}
-        <div className="relative -mt-8 bg-white px-5 pb-6 pt-2">
-          <div className="mx-auto w-full rounded-2xl bg-white p-6 shadow-[0_18px_50px_-22px_rgba(0,0,0,0.35)] ring-1 ring-black/5">
-            {children}
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pt-10 pb-6">
+        {/* Brand mark */}
+        <div className="flex flex-col items-center text-white">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur-sm">
+            <img src={shellLogo} alt="Shell" width={44} height={44} className="h-11 w-11 object-contain" />
+          </div>
+          <div className="mt-2 text-[11px] font-bold tracking-[0.5em] text-shell-yellow">
+            SHELL · PH
           </div>
         </div>
 
-        {/* RED FOOTER (compact, copyright only) */}
-        <div className="relative bg-[radial-gradient(120%_90%_at_50%_100%,#8a1216_0%,#6c0e12_60%,#4a0a0d_100%)] pt-4">
-          <div className="absolute inset-x-0 -top-px rotate-180">
-            <Wave fill="#6c0e12" />
-          </div>
-          <ContactFooter />
+        {/* Card */}
+        <div className="mt-7 rounded-3xl bg-white p-6 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.35)] ring-1 ring-black/[0.04]">
+          <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-foreground">
+            {title}
+          </h1>
+          <p className="mt-1 text-[13.5px] text-muted-foreground">{subtitle}</p>
+
+          <div className="mt-6">{children}</div>
+        </div>
+
+        {footer && <div className="mt-5">{footer}</div>}
+
+        <div className="mt-auto pt-8 text-center text-[10px] font-semibold tracking-[0.22em] text-foreground/45">
+          © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ---------------- visual bits ---------------- */
-
-function Wave({ fill }: { fill: string }) {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 leading-[0]">
-      <svg viewBox="0 0 500 30" preserveAspectRatio="none" className="absolute inset-x-0 bottom-7 h-3 w-full">
-        <path d="M0,18 Q125,2 250,18 T500,18" stroke="#FFD500" strokeWidth="1.5" fill="none" opacity="0.9" />
-      </svg>
-      <svg viewBox="0 0 500 60" preserveAspectRatio="none" className="block h-10 w-full">
-        <path d="M0,35 Q125,0 250,28 T500,18 L500,60 L0,60 Z" fill={fill} />
-      </svg>
-    </div>
-  );
-}
-
-function Cityscape() {
-  return (
-    <svg aria-hidden viewBox="0 0 480 200" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 bottom-0 h-56 w-full opacity-[0.18]">
-      <defs>
-        <linearGradient id="bldg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#000" stopOpacity="0" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0.9" />
-        </linearGradient>
-      </defs>
-      <path fill="url(#bldg)" d="M0,200 L0,120 L30,120 L30,90 L60,90 L60,60 L95,60 L95,100 L120,100 L120,70 L150,70 L150,40 L185,40 L185,80 L215,80 L215,55 L245,55 L245,30 L275,30 L275,75 L305,75 L305,50 L340,50 L340,90 L370,90 L370,65 L400,65 L400,110 L430,110 L430,85 L460,85 L460,120 L480,120 L480,200 Z" />
-      {Array.from({ length: 80 }).map((_, i) => {
-        const x = ((i * 37) % 470) + 6;
-        const y = 95 + ((i * 17) % 85);
-        return <rect key={i} x={x} y={y} width="2" height="3" fill="#ffd34a" opacity={i % 4 === 0 ? 0.95 : 0.45} />;
-      })}
-    </svg>
-  );
-}
-
-function ContactFooter() {
-  return (
-    <div className="px-6 pb-4 pt-2 text-center text-[10px] font-semibold tracking-[0.18em] text-white/75">
-      © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES · ALL RIGHTS RESERVED
     </div>
   );
 }
 
 /* ---------------- form primitives ---------------- */
 
-export function FieldBox({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+export function Field({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-white px-4 py-3.5 transition focus-within:border-shell-red/60 focus-within:ring-2 focus-within:ring-shell-red/15">
-      <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
-      {children}
-    </div>
+    <label className="block">
+      <span className="mb-1.5 block text-[11.5px] font-bold uppercase tracking-[0.14em] text-foreground/60">
+        {label}
+      </span>
+      <div className="group flex items-center gap-2.5 rounded-xl border border-border bg-[#FAFAFA] px-3.5 py-3 transition focus-within:border-shell-red focus-within:bg-white focus-within:ring-4 focus-within:ring-shell-red/10">
+        {icon && <span className="flex h-5 w-5 items-center justify-center text-shell-red">{icon}</span>}
+        {children}
+      </div>
+    </label>
   );
 }
 
-export function PhoneField({ value, onChange, placeholder = "Mobile number" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+export function PhoneInput({
+  value,
+  onChange,
+  placeholder = "9XX XXX XXXX",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-border bg-white pl-4 pr-3 py-3 transition focus-within:border-shell-red/60 focus-within:ring-2 focus-within:ring-shell-red/15">
-      <UserIcon size={20} className="text-shell-red" />
-      <div className="ml-1 flex items-center gap-0.5 text-[15px] font-extrabold text-shell-red">
-        +63 <ChevronDown size={14} className="text-shell-red/70" />
-      </div>
-      <span className="mx-2 h-6 w-px bg-border" />
+    <Field label="Mobile number">
+      <span className="flex items-center gap-1 text-[14.5px] font-extrabold text-shell-red">
+        +63
+      </span>
+      <span className="h-5 w-px bg-border" />
       <input
         type="tel"
         inputMode="numeric"
@@ -114,8 +105,39 @@ export function PhoneField({ value, onChange, placeholder = "Mobile number" }: {
         placeholder={placeholder}
         required
         autoComplete="tel"
-        className="flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
+        className="flex-1 bg-transparent text-[15px] font-medium tracking-wide text-foreground outline-none placeholder:text-muted-foreground/70"
       />
-    </div>
+    </Field>
+  );
+}
+
+export function PrimaryButton({
+  children,
+  loading,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
+  return (
+    <button
+      {...props}
+      disabled={loading || props.disabled}
+      className="group relative w-full overflow-hidden rounded-xl bg-[linear-gradient(180deg,#E72428_0%,#A8161A_100%)] px-5 py-3.5 text-[14px] font-extrabold tracking-[0.18em] text-white shadow-[0_12px_24px_-10px_rgba(168,22,26,0.55)] transition active:scale-[0.99] disabled:opacity-60"
+    >
+      <span className="absolute inset-x-0 top-0 h-px bg-white/30" />
+      {loading ? "PLEASE WAIT…" : children}
+    </button>
+  );
+}
+
+export function GhostButton({
+  children,
+  ...props
+}: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
+  return (
+    <a
+      {...props}
+      className="flex w-full items-center justify-center gap-2 rounded-xl border border-foreground/10 bg-white px-5 py-3.5 text-[13px] font-bold tracking-[0.18em] text-foreground/80 transition hover:border-shell-red/40 hover:text-shell-red"
+    >
+      {children}
+    </a>
   );
 }
