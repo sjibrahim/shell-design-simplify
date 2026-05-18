@@ -159,6 +159,16 @@ export function ResourcePage(p: ResourcePageProps) {
               {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           ))}
+          {p.bulkActions && selected.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1 ring-1 ring-slate-200">
+              <span className="px-1 text-[11px] font-bold text-slate-500">{selected.length} selected</span>
+              {p.bulkActions.map((a) => (
+                <button key={a.label} onClick={() => void a.run(selected, load)} className={a.className || "rounded-md bg-slate-900 px-2.5 py-1.5 text-[11px] font-bold text-white"}>
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto">
