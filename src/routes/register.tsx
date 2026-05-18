@@ -1,15 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Lock, Eye, EyeOff, Users, Phone, User as UserIcon } from "lucide-react";
-import { AuthShell, Tabs, Field, TrustBar } from "./login";
+import { Lock, Eye, EyeOff, Users, User as UserIcon, UserPlus } from "lucide-react";
+import { AuthShell, FieldBox, PhoneField } from "./login";
 import { registerUser } from "@/lib/user-api";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Register — Shell Oil" },
-      { name: "description", content: "Create your Shell Oil investment account." },
+      { title: "Register — Shell Company Philippines" },
+      { name: "description", content: "Create your Shell Company Philippines account." },
     ],
   }),
   component: RegisterPage,
@@ -39,64 +39,76 @@ function RegisterPage() {
   };
 
   return (
-    <AuthShell>
-      <Tabs active="register" />
-      <form onSubmit={submit} className="mt-5 space-y-4">
+    <AuthShell title="Create Account" subtitle="Join Shell Company Philippines today">
+      <form onSubmit={submit} className="mt-5 space-y-3.5">
         {err && (
-          <div className="rounded-2xl bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-700 ring-1 ring-rose-200">
+          <div className="rounded-xl bg-rose-50 px-3 py-2.5 text-xs font-semibold text-rose-700 ring-1 ring-rose-200">
             {err}
           </div>
         )}
-        <Field label="Phone Number" icon={<Phone size={18} />}>
-          <span className="pl-2 pr-1 text-sm font-extrabold text-shell-red">+63</span>
-          <span className="mr-2 h-5 w-px bg-border" />
+
+        <PhoneField value={phone} onChange={setPhone} />
+
+        <FieldBox icon={<UserIcon size={18} className="text-shell-red" />}>
           <input
-            type="tel" inputMode="numeric" value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-            placeholder="9XX XXX XXXX" required autoComplete="tel"
-            className="flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Full name (optional)"
+            autoComplete="name"
+            className="flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
           />
-        </Field>
-        <Field label="Full Name (optional)" icon={<UserIcon size={18} />}>
+        </FieldBox>
+
+        <FieldBox icon={<Lock size={18} className="text-shell-red" />}>
           <input
-            value={name} onChange={(e) => setName(e.target.value)}
-            placeholder="Juan Dela Cruz" autoComplete="name"
-            className="flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground"
-          />
-        </Field>
-        <Field label="Password" icon={<Lock size={18} />}>
-          <input
-            type={show ? "text" : "password"} value={password}
+            type={show ? "text" : "password"}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Min. 4 characters" required autoComplete="new-password"
-            className="flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+            placeholder="Password (min 4 characters)"
+            required
+            autoComplete="new-password"
+            className="flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <button type="button" onClick={() => setShow((s) => !s)} className="text-muted-foreground" aria-label="Toggle password">
-            {show ? <EyeOff size={18} /> : <Eye size={18} />}
+          <button type="button" onClick={() => setShow((s) => !s)} className="px-1 text-muted-foreground" aria-label="Toggle password">
+            {show ? <Eye size={18} /> : <EyeOff size={18} />}
           </button>
-        </Field>
-        <Field label="Invitation Code (optional)" icon={<Users size={18} />}>
+        </FieldBox>
+
+        <FieldBox icon={<Users size={18} className="text-shell-red" />}>
           <input
             value={refCode}
             onChange={(e) => setRefCode(e.target.value.toUpperCase())}
-            placeholder="SHELL…"
-            className="flex-1 bg-transparent text-base font-extrabold tracking-widest text-foreground outline-none placeholder:text-muted-foreground"
+            placeholder="Invitation code (optional)"
+            className="flex-1 bg-transparent text-[15px] font-extrabold tracking-widest text-foreground outline-none placeholder:text-muted-foreground placeholder:font-medium placeholder:tracking-normal"
           />
-        </Field>
+        </FieldBox>
 
         <button
           disabled={loading}
-          className="w-full rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-4 text-base font-extrabold tracking-wide text-white shadow-lg shadow-shell-red/30 transition active:scale-[0.99] disabled:opacity-60"
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-shell-red to-shell-red-dark py-3.5 text-[15px] font-extrabold tracking-wider text-white shadow-lg shadow-shell-red/30 transition active:scale-[0.99] disabled:opacity-60"
         >
-          {loading ? "Creating account…" : "Create Account"}
+          <UserPlus size={16} />
+          {loading ? "CREATING…" : "REGISTER"}
         </button>
 
         <p className="text-center text-[11px] text-muted-foreground">
           By signing up you agree to our Terms & Privacy Policy.
         </p>
-      </form>
 
-      <TrustBar />
+        <div className="flex items-center gap-3 py-1">
+          <span className="h-px flex-1 bg-border" />
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">or</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+
+        <Link
+          to="/login"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-shell-red/90 bg-white py-3.5 text-[14px] font-extrabold tracking-wider text-shell-red transition hover:bg-shell-red/5"
+        >
+          <Lock size={16} />
+          SIGN IN INSTEAD
+        </Link>
+      </form>
     </AuthShell>
   );
 }
