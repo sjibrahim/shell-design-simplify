@@ -81,27 +81,8 @@ function Cityscape() {
 
 function ContactFooter() {
   return (
-    <div className="px-6 pb-8 text-white">
-      <div className="grid grid-cols-3 gap-3 text-center text-[11px] leading-snug text-white/95">
-        <FootItem icon={<MapPin size={18} />} label={<>25th Floor, Ayala<br/>Triangle Gardens<br/>Makati City,<br/>Philippines</>} />
-        <FootItem icon={<PhoneIcon size={18} />} label={<>+63 2 8123 4567</>} />
-        <FootItem icon={<Mail size={18} />} label={<>info@shellcompany.ph</>} />
-      </div>
-      <div className="mt-6 border-t border-white/15 pt-3 text-center text-[10px] font-semibold tracking-[0.18em] text-white/75">
-        © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES.
-        <br />ALL RIGHTS RESERVED.
-      </div>
-    </div>
-  );
-}
-
-function FootItem({ icon, label }: { icon: React.ReactNode; label: React.ReactNode }) {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-shell-yellow text-[#8a1216] shadow-md">
-        {icon}
-      </span>
-      <span className="leading-tight">{label}</span>
+    <div className="px-6 pb-4 pt-2 text-center text-[10px] font-semibold tracking-[0.18em] text-white/75">
+      © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES · ALL RIGHTS RESERVED
     </div>
   );
 }
