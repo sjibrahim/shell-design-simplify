@@ -121,7 +121,8 @@ withdrawals.get('/', async (req, res) => {
   const W = where.length ? `WHERE ${where.join(' AND ')}` : '';
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) total FROM withdrawals w ${W}`, params);
   const [items] = await pool.query(
-    `SELECT w.*, u.phone AS user_phone, u.name AS user_name
+    `SELECT w.*, w.channel AS method, CONCAT(w.channel, ' · ', w.account_no) AS account,
+            u.phone AS user_phone, u.phone AS user_email, u.name AS user_name
        FROM withdrawals w LEFT JOIN users u ON u.id = w.user_id
        ${W} ORDER BY w.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
@@ -130,13 +131,13 @@ withdrawals.get('/', async (req, res) => {
 });
 
 withdrawals.post('/', async (req, res) => {
-  const { user_id, amount, channel, account_no, account_name, status, ref_no, note } = req.body || {};
+  const { user_id, amount, channel, method, account_no, account, account_name, status, ref_no, note } = req.body || {};
   if (!user_id || !amount) return res.status(400).json({ error: 'user_id and amount required' });
   const fee = +(Number(amount) * 0.05).toFixed(2);
   const net = +(Number(amount) - fee).toFixed(2);
   const [r] = await pool.query(
     'INSERT INTO withdrawals (user_id, amount, fee, net_amount, channel, account_no, account_name, status, ref_no, note) VALUES (?,?,?,?,?,?,?,?,?,?)',
-    [user_id, amount, fee, net, channel || 'GCash', account_no || '', account_name || null, status || 'pending', ref_no || null, note || null]
+    [user_id, amount, fee, net, channel || method || 'GCash', account_no || account || '', account_name || null, status || 'pending', ref_no || null, note || null]
   );
   res.json({ ok: true, id: r.insertId });
 });
@@ -160,7 +161,7 @@ withdrawals.put('/:id', async (req, res) => {
     );
     const wasOpen = ['pending', 'processing'].includes(row.status);
     // Mark paid out -> transaction success (balance already deducted at request time)
-    if (wasOpen && newStatus === 'success') {
+    if (wasOpen && ['success', 'paid'].includes(newStatus)) {
       await conn.query(
         `UPDATE transactions SET status='success' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`,
         [row.user_id, `Withdraw #${id}`]
