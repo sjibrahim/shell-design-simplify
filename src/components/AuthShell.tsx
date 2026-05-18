@@ -1,4 +1,4 @@
-import { MapPin, Phone as PhoneIcon, Mail, User as UserIcon, ChevronDown } from "lucide-react";
+import { User as UserIcon, ChevronDown } from "lucide-react";
 import shellLogo from "@/assets/shell-logo.png";
 
 /* =========================================================
@@ -9,36 +9,32 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen w-full bg-[#5a0c0f]">
       <div className="relative mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-[#5a0c0f]">
-        {/* HERO */}
-        <section className="relative overflow-hidden bg-[radial-gradient(120%_90%_at_50%_0%,#8a1216_0%,#6c0e12_55%,#4a0a0d_100%)] px-6 pb-16 pt-12 text-white">
+        {/* HERO (compact) */}
+        <section className="relative overflow-hidden bg-[radial-gradient(120%_90%_at_50%_0%,#8a1216_0%,#6c0e12_55%,#4a0a0d_100%)] px-6 pb-10 pt-6 text-white">
           <Cityscape />
           <div className="relative flex flex-col items-center text-center">
-            <img src={shellLogo} alt="Shell" width={104} height={104} className="h-24 w-24 object-contain drop-shadow-[0_6px_18px_rgba(0,0,0,0.5)]" />
-            <h1 className="mt-3 text-[26px] font-extrabold leading-none tracking-[0.02em] text-white">
+            <img src={shellLogo} alt="Shell" width={72} height={72} className="h-16 w-16 object-contain drop-shadow-[0_6px_18px_rgba(0,0,0,0.5)]" />
+            <h1 className="mt-2 text-[20px] font-extrabold leading-none tracking-[0.02em] text-white">
               SHELL COMPANY
             </h1>
-            <div className="mt-3 flex items-center gap-3 text-[12px] font-bold tracking-[0.45em] text-shell-yellow">
-              <span className="h-px w-9 bg-shell-yellow" />
+            <div className="mt-2 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.4em] text-shell-yellow">
+              <span className="h-px w-7 bg-shell-yellow" />
               PHILIPPINES
-              <span className="h-px w-9 bg-shell-yellow" />
+              <span className="h-px w-7 bg-shell-yellow" />
             </div>
-            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90">
-              Building Trust. Delivering Value.
-            </p>
           </div>
-          {/* wave bottom + gold curve */}
           <Wave fill="#ffffff" />
         </section>
 
-        {/* WHITE CARD */}
-        <div className="relative -mt-2 bg-white px-5 pb-10 pt-6">
+        {/* WHITE CARD — pulled up */}
+        <div className="relative -mt-8 bg-white px-5 pb-6 pt-2">
           <div className="mx-auto w-full rounded-2xl bg-white p-6 shadow-[0_18px_50px_-22px_rgba(0,0,0,0.35)] ring-1 ring-black/5">
             {children}
           </div>
         </div>
 
-        {/* RED FOOTER with wave top */}
-        <div className="relative flex-1 bg-[radial-gradient(120%_90%_at_50%_100%,#8a1216_0%,#6c0e12_60%,#4a0a0d_100%)] pt-10">
+        {/* RED FOOTER (compact, copyright only) */}
+        <div className="relative bg-[radial-gradient(120%_90%_at_50%_100%,#8a1216_0%,#6c0e12_60%,#4a0a0d_100%)] pt-4">
           <div className="absolute inset-x-0 -top-px rotate-180">
             <Wave fill="#6c0e12" />
           </div>
@@ -85,27 +81,8 @@ function Cityscape() {
 
 function ContactFooter() {
   return (
-    <div className="px-6 pb-8 text-white">
-      <div className="grid grid-cols-3 gap-3 text-center text-[11px] leading-snug text-white/95">
-        <FootItem icon={<MapPin size={18} />} label={<>25th Floor, Ayala<br/>Triangle Gardens<br/>Makati City,<br/>Philippines</>} />
-        <FootItem icon={<PhoneIcon size={18} />} label={<>+63 2 8123 4567</>} />
-        <FootItem icon={<Mail size={18} />} label={<>info@shellcompany.ph</>} />
-      </div>
-      <div className="mt-6 border-t border-white/15 pt-3 text-center text-[10px] font-semibold tracking-[0.18em] text-white/75">
-        © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES.
-        <br />ALL RIGHTS RESERVED.
-      </div>
-    </div>
-  );
-}
-
-function FootItem({ icon, label }: { icon: React.ReactNode; label: React.ReactNode }) {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-shell-yellow text-[#8a1216] shadow-md">
-        {icon}
-      </span>
-      <span className="leading-tight">{label}</span>
+    <div className="px-6 pb-4 pt-2 text-center text-[10px] font-semibold tracking-[0.18em] text-white/75">
+      © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES · ALL RIGHTS RESERVED
     </div>
   );
 }
