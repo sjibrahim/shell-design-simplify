@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ResourcePage, StatusBadge } from "@/components/ResourcePage";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Zap, Wallet } from "lucide-react";
 import { apiPost, apiPut } from "@/lib/admin-api";
 import { toast } from "sonner";
 
