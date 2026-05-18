@@ -21,20 +21,30 @@ import {
 import { getStoredAdmin, setStoredAdmin, setToken, type AdminUser } from "@/lib/admin-api";
 import { useNavigate } from "@tanstack/react-router";
 
-const NAV = [
-  { to: "/admin",               label: "Dashboard",      icon: LayoutDashboard },
-  { to: "/admin/members",       label: "Members",        icon: Users },
-  { to: "/admin/plans",         label: "Plan Products",  icon: Package },
-  { to: "/admin/sliders",       label: "Sliders",        icon: ImageIcon },
-  { to: "/admin/transactions",  label: "Transactions",   icon: Receipt },
-  { to: "/admin/withdrawals",   label: "Withdrawals",    icon: ArrowDownToLine },
-  { to: "/admin/recharges",     label: "Recharges",      icon: Wallet },
-  { to: "/admin/payouts",       label: "Payouts",        icon: Banknote },
-  { to: "/admin/rewards",       label: "Rewards",        icon: Gift },
-  { to: "/admin/redeem-codes",  label: "Redeem Codes",   icon: Ticket },
-  { to: "/admin/gateways",      label: "Gateways",       icon: CreditCard },
-  { to: "/admin/settings",      label: "Settings",       icon: SettingsIcon },
-] as const;
+const NAV_SECTIONS: { label: string; items: { to: string; label: string; icon: typeof LayoutDashboard }[] }[] = [
+  { label: "Overview", items: [
+    { to: "/admin",               label: "Dashboard",      icon: LayoutDashboard },
+  ]},
+  { label: "Users", items: [
+    { to: "/admin/members",       label: "Members",        icon: Users },
+  ]},
+  { label: "Catalog", items: [
+    { to: "/admin/plans",         label: "Plan Products",  icon: Package },
+    { to: "/admin/sliders",       label: "Sliders",        icon: ImageIcon },
+    { to: "/admin/rewards",       label: "Rewards",        icon: Gift },
+    { to: "/admin/redeem-codes",  label: "Redeem Codes",   icon: Ticket },
+  ]},
+  { label: "Finance", items: [
+    { to: "/admin/transactions",  label: "Transactions",   icon: Receipt },
+    { to: "/admin/recharges",     label: "Recharges",      icon: Wallet },
+    { to: "/admin/withdrawals",   label: "Withdrawals",    icon: ArrowDownToLine },
+    { to: "/admin/payouts",       label: "Payouts",        icon: Banknote },
+  ]},
+  { label: "System", items: [
+    { to: "/admin/gateways",      label: "Gateways",       icon: CreditCard },
+    { to: "/admin/settings",      label: "Settings",       icon: SettingsIcon },
+  ]},
+];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
