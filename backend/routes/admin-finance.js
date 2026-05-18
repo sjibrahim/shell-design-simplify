@@ -21,7 +21,8 @@ recharges.get('/', async (req, res) => {
   const W = where.length ? `WHERE ${where.join(' AND ')}` : '';
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) total FROM recharges r ${W}`, params);
   const [items] = await pool.query(
-    `SELECT r.*, u.phone AS user_phone, u.name AS user_name
+    `SELECT r.*, r.gateway AS method, r.ref_no AS reference,
+            u.phone AS user_phone, u.phone AS user_email, u.name AS user_name
        FROM recharges r LEFT JOIN users u ON u.id = r.user_id
        ${W} ORDER BY r.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
@@ -30,32 +31,43 @@ recharges.get('/', async (req, res) => {
 });
 
 recharges.post('/', async (req, res) => {
-  const { user_id, amount, gateway, ref_no, status, note } = req.body || {};
+  const { user_id, amount, gateway, method, ref_no, reference, status, note } = req.body || {};
   if (!user_id || !amount) return res.status(400).json({ error: 'user_id and amount required' });
-  const [r] = await pool.query(
-    'INSERT INTO recharges (user_id, amount, gateway, ref_no, status, note) VALUES (?,?,?,?,?,?)',
-    [user_id, amount, gateway || 'Manual', ref_no || null, status || 'pending', note || null]
-  );
-  res.json({ ok: true, id: r.insertId });
+  const amt = Number(amount);
+  const st = status || 'pending';
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [r] = await conn.query(
+      'INSERT INTO recharges (user_id, amount, gateway, ref_no, status, note) VALUES (?,?,?,?,?,?)',
+      [user_id, amt, gateway || method || 'Manual', ref_no || reference || null, st, note || null]
+    );
+    await conn.query(
+      'INSERT INTO transactions (user_id, type, amount, status, note) VALUES (?,?,?,?,?)',
+      [user_id, 'recharge', amt, st === 'success' ? 'success' : st, `Recharge #${r.insertId}`]
+    );
+    if (st === 'success') {
+      await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id = ?', [amt, amt, user_id]);
+    }
+    await conn.commit();
+    res.json({ ok: true, id: r.insertId });
+  } catch (e) { await conn.rollback(); res.status(500).json({ error: e.message }); }
+  finally { conn.release(); }
 });
 
 recharges.put('/:id', async (req, res) => {
   const id = req.params.id;
-  const [[cur]] = await pool.query('SELECT * FROM recharges WHERE id = ? FOR UPDATE', [id]).then(r => [r[0] ? r : [null]]).catch(() => [[null]]);
-  // Re-query simply (without FOR UPDATE complication)
-  const [rows] = await pool.query('SELECT * FROM recharges WHERE id = ?', [id]);
-  const row = rows[0];
-  if (!row) return res.status(404).json({ error: 'Not found' });
-
-  const newStatus = req.body.status || row.status;
-  const newAmount = req.body.amount !== undefined ? Number(req.body.amount) : Number(row.amount);
-  const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
-  const newGateway = req.body.gateway !== undefined ? req.body.gateway : row.gateway;
-  const newNote = req.body.note !== undefined ? req.body.note : row.note;
-
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    const [rows] = await conn.query('SELECT * FROM recharges WHERE id = ? FOR UPDATE', [id]);
+    const row = rows[0];
+    if (!row) { await conn.rollback(); return res.status(404).json({ error: 'Not found' }); }
+    const newStatus = req.body.status || row.status;
+    const newAmount = req.body.amount !== undefined ? Number(req.body.amount) : Number(row.amount);
+    const newRef = req.body.ref_no !== undefined ? req.body.ref_no : (req.body.reference !== undefined ? req.body.reference : row.ref_no);
+    const newGateway = req.body.gateway !== undefined ? req.body.gateway : (req.body.method !== undefined ? req.body.method : row.gateway);
+    const newNote = req.body.note !== undefined ? req.body.note : row.note;
     await conn.query(
       'UPDATE recharges SET status=?, amount=?, ref_no=?, gateway=?, note=? WHERE id=?',
       [newStatus, newAmount, newRef, newGateway, newNote, id]
