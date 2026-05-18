@@ -4,12 +4,13 @@ import { AdminCard, PageTitle, StatusBadge } from "./AdminLayout";
 import { apiDelete, apiGet, apiPost, apiPut, type ListResult } from "@/lib/admin-api";
 
 export type FieldType = "text" | "number" | "select" | "textarea";
+type SelectOption = string | number | { label: string; value: string | number };
 
 export interface FieldDef {
   name: string;
   label: string;
   type?: FieldType;
-  options?: string[];           // for select
+  options?: SelectOption[];           // for select
   required?: boolean;
   width?: "full" | "half";
 }
@@ -34,6 +35,8 @@ export interface ResourcePageProps {
   pinnedFilterKey?: string;     // e.g. "status" for the tab strip in withdrawals
   pinnedFilterLabel?: string;
   pinnedFilterOptions?: { value: string; label: string }[];
+  renderRowActions?: (row: Record<string, unknown>, reload: () => void) => React.ReactNode;
+  bulkActions?: { label: string; run: (ids: number[], reload: () => void) => Promise<void> | void; className?: string }[];
 }
 
 export function ResourcePage(p: ResourcePageProps) {
