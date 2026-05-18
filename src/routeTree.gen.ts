@@ -28,6 +28,7 @@ import { Route as InviteRouteImport } from './routes/invite'
 import { Route as IncomeDetailsRouteImport } from './routes/income-details'
 import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as AppDownloadRouteImport } from './routes/app-download'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AddBankRouteImport } from './routes/add-bank'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -127,6 +128,11 @@ const AppDownloadRoute = AppDownloadRouteImport.update({
   path: '/app-download',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AddBankRoute = AddBankRouteImport.update({
   id: '/add-bank',
   path: '/add-bank',
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/add-bank': typeof AddBankRoute
+  '/admin': typeof AdminRoute
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/add-bank': typeof AddBankRoute
+  '/admin': typeof AdminRoute
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/add-bank': typeof AddBankRoute
+  '/admin': typeof AdminRoute
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/add-bank'
+    | '/admin'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/add-bank'
+    | '/admin'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/add-bank'
+    | '/admin'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AddBankRoute: typeof AddBankRoute
+  AdminRoute: typeof AdminRoute
   AppDownloadRoute: typeof AppDownloadRoute
   ChannelRoute: typeof ChannelRoute
   IncomeDetailsRoute: typeof IncomeDetailsRoute
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/add-bank': {
       id: '/add-bank'
       path: '/add-bank'
@@ -479,6 +499,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AddBankRoute: AddBankRoute,
+  AdminRoute: AdminRoute,
   AppDownloadRoute: AppDownloadRoute,
   ChannelRoute: ChannelRoute,
   IncomeDetailsRoute: IncomeDetailsRoute,
@@ -502,3 +523,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
