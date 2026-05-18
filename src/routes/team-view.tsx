@@ -18,8 +18,8 @@ type Member = { id: number | string; phone: string; name?: string | null; level:
 
 const statusStyle = {
   active: "bg-shell-green/15 text-shell-green",
-  new:    "bg-shell-yellow/30 text-[#8a6500]",
-  idle:   "bg-muted text-muted-foreground",
+  inactive: "bg-muted text-muted-foreground",
+  blocked: "bg-shell-red/10 text-shell-red",
 };
 
 function TeamViewPage() {
