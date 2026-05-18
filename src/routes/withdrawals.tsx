@@ -7,7 +7,6 @@ import {
   Clock,
   Check,
   X,
-  Hash,
   Calendar,
   Shield,
   Receipt,
