@@ -86,8 +86,10 @@ const INTERVAL_MS = 6500;
 const FIRST_DELAY_MS = 2500;
 
 export function ActivityPopup() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [toast, setToast] = useState<Toast | null>(null);
   const [visible, setVisible] = useState(false);
+  const hidden = pathname.startsWith("/admin") || pathname === "/login" || pathname === "/register";
 
   useEffect(() => {
     let hideTimer: ReturnType<typeof setTimeout>;
