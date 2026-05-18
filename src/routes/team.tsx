@@ -202,8 +202,8 @@ function TeamPage() {
 
 function Cell({ value, label, accent = false }: { value: string; label: string; accent?: boolean }) {
   return (
-    <div className="text-center">
-      <div className={`text-lg font-extrabold leading-tight ${accent ? "text-shell-red" : "text-foreground"}`}>{value}</div>
+    <div className="bg-white/70 px-2 py-2.5 text-center">
+      <div className={`text-base font-extrabold leading-tight ${accent ? "text-shell-red" : "text-foreground"}`}>{value}</div>
       <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</div>
     </div>
   );
