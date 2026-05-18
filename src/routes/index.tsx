@@ -16,6 +16,7 @@ import shellHero from "@/assets/shell-hero.jpg";
 import shellPlan from "@/assets/shell-plan.jpg";
 import { useAuth } from "@/lib/auth";
 import { fmtPeso, uGet, uPost } from "@/lib/user-api";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,6 +52,7 @@ function HomePage() {
   const [plans, setPlans] = useState<ApiPlan[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [buying, setBuying] = useState<number | null>(null);
+  const [confirmPlan, setConfirmPlan] = useState<ApiPlan | null>(null);
 
   useEffect(() => {
     uGet<{ ok: true; items: ApiPlan[] }>("/api/u/plans")
@@ -61,13 +63,13 @@ function HomePage() {
 
   const buy = async (p: ApiPlan) => {
     if (!user) { navigate({ to: "/login" }); return; }
-    if (!confirm(`Purchase ${p.name} for ${fmtPeso(p.price)}?`)) return;
     setBuying(p.id);
     try {
       await uPost("/api/u/buy-plan", { plan_id: p.id });
       await refresh();
-      alert("Purchase successful!");
-    } catch (e) { alert((e as Error).message); }
+      setConfirmPlan(null);
+      toast.success("Plan purchased successfully", { description: `${p.name} is now active.` });
+    } catch (e) { toast.error("Purchase failed", { description: (e as Error).message }); }
     finally { setBuying(null); }
   };
 
