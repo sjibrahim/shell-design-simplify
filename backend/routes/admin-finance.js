@@ -187,4 +187,60 @@ withdrawals.delete('/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+recharges.post('/bulk/status', async (req, res) => {
+  const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Boolean) : [];
+  const status = req.body?.status;
+  if (!ids.length || !['success', 'failed', 'pending', 'processing'].includes(status)) return res.status(400).json({ error: 'Valid ids and status required' });
+  let updated = 0;
+  for (const id of ids) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [rows] = await conn.query('SELECT * FROM recharges WHERE id = ? FOR UPDATE', [id]);
+      const row = rows[0];
+      if (!row) { await conn.rollback(); continue; }
+      await conn.query('UPDATE recharges SET status=? WHERE id=?', [status, id]);
+      const wasOpen = ['pending', 'processing'].includes(row.status);
+      if (wasOpen && status === 'success') {
+        await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id=?', [row.amount, row.amount, row.user_id]);
+        await conn.query(`UPDATE transactions SET status='success' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
+      }
+      if (wasOpen && status === 'failed') {
+        await conn.query(`UPDATE transactions SET status='failed' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
+      }
+      await conn.commit(); updated += 1;
+    } catch (e) { await conn.rollback(); }
+    finally { conn.release(); }
+  }
+  res.json({ ok: true, updated });
+});
+
+withdrawals.post('/bulk/status', async (req, res) => {
+  const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Boolean) : [];
+  const status = req.body?.status;
+  if (!ids.length || !['success', 'paid', 'failed', 'pending', 'processing'].includes(status)) return res.status(400).json({ error: 'Valid ids and status required' });
+  let updated = 0;
+  for (const id of ids) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [rows] = await conn.query('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
+      const row = rows[0];
+      if (!row) { await conn.rollback(); continue; }
+      await conn.query('UPDATE withdrawals SET status=? WHERE id=?', [status, id]);
+      const wasOpen = ['pending', 'processing'].includes(row.status);
+      if (wasOpen && ['success', 'paid'].includes(status)) {
+        await conn.query(`UPDATE transactions SET status='success' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`, [row.user_id, `Withdraw #${id}`]);
+      }
+      if (wasOpen && status === 'failed') {
+        await conn.query('UPDATE users SET balance = balance + ?, total_withdraw = GREATEST(total_withdraw - ?, 0) WHERE id=?', [row.amount, row.amount, row.user_id]);
+        await conn.query(`UPDATE transactions SET status='failed' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`, [row.user_id, `Withdraw #${id}`]);
+      }
+      await conn.commit(); updated += 1;
+    } catch (e) { await conn.rollback(); }
+    finally { conn.release(); }
+  }
+  res.json({ ok: true, updated });
+});
+
 module.exports = { recharges, withdrawals };
