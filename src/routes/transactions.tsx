@@ -69,11 +69,13 @@ function TransactionsPage() {
         </div>
 
         <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 shadow-sm">
-          {list.length === 0 && (
+          {loading && <div className="px-4 py-10 text-center text-sm text-muted-foreground">Loading…</div>}
+          {!loading && list.length === 0 && (
             <div className="px-4 py-10 text-center text-sm text-muted-foreground">No transactions yet.</div>
           )}
           {list.map((t, i) => {
-            const m = meta[t.type];
+            const m = meta[t.type as Tx["type"]];
+            if (!m) return null;
             const Icon = m.icon;
             return (
               <div
@@ -85,13 +87,13 @@ function TransactionsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-extrabold text-foreground">{m.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{t.date} · {t.id}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">{new Date(t.created_at).toLocaleString()} · #{t.id}</div>
                 </div>
                 <div className="text-right">
                   <div className={`text-sm font-extrabold ${m.sign === "+" ? "text-shell-green" : "text-shell-red"}`}>
-                    {m.sign}₱{t.amount.toLocaleString()}
+                    {m.sign}{fmtPeso(t.amount)}
                   </div>
-                  <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${statusStyle[t.status]}`}>
+                  <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${statusStyle[(t.status as keyof typeof statusStyle) || "success"]}`}>
                     {t.status}
                   </span>
                 </div>
