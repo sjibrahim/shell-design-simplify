@@ -49,6 +49,7 @@ export function ResourcePage(p: ResourcePageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [editing, setEditing] = useState<null | { mode: "create" | "edit"; row: Record<string, unknown> }>(null);
+  const [selected, setSelected] = useState<number[]>([]);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -56,7 +57,7 @@ export function ResourcePage(p: ResourcePageProps) {
       const res = await apiGet<ListResult<Record<string, unknown>>>(p.endpoint, {
         page, limit, q, ...filters,
       });
-      setItems(res.items); setTotal(res.total);
+      setItems(res.items); setTotal(res.total); setSelected([]);
     } catch (e) { setError((e as Error).message); }
     finally { setLoading(false); }
   };
@@ -64,6 +65,9 @@ export function ResourcePage(p: ResourcePageProps) {
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [page, JSON.stringify(filters)]);
 
   const submitSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); void load(); };
+  const toggleSelected = (id: number) => setSelected((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]);
+  const allPageSelected = items.length > 0 && items.every((row) => selected.includes(row.id as number));
+  const toggleAll = () => setSelected(allPageSelected ? [] : items.map((row) => row.id as number));
 
   const startCreate = () => {
     const blank: Record<string, unknown> = {};
