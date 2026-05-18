@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { ActivityPopup } from "@/components/ActivityPopup";
 import { AuthProvider } from "@/lib/auth";
+import { AuthGate } from "@/components/RequireAuth";
 
 function NotFoundComponent() {
   return (
