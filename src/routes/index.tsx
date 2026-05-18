@@ -38,6 +38,7 @@ const quickActions = [
 interface ApiPlan {
   id: number;
   name: string;
+  type?: "normal" | "vip";
   price: string | number;
   daily_income: string | number;
   total_days: number;
@@ -50,6 +51,7 @@ function HomePage() {
   const navigate = useNavigate();
   const { user, refresh } = useAuth();
   const [plans, setPlans] = useState<ApiPlan[]>([]);
+  const [planTab, setPlanTab] = useState<"normal" | "vip">("normal");
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [buying, setBuying] = useState<number | null>(null);
   const [confirmPlan, setConfirmPlan] = useState<ApiPlan | null>(null);
@@ -93,24 +95,9 @@ function HomePage() {
           >
             <Bell size={20} />
           </Link>
-        </div>
-        {/* Balance */}
-        <div className="relative mt-6 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
-          <div className="text-[11px] font-bold uppercase tracking-widest text-white/80">Wallet Balance</div>
-          <div className="mt-1 text-3xl font-extrabold">
-            {user ? fmtPeso(user.balance) : "—"}
-          </div>
-          <div className="mt-1 flex gap-4 text-[11px] text-white/80">
-            <span>Recharge: <b className="text-white">{user ? fmtPeso(user.total_recharge) : "—"}</b></span>
-            <span>Income: <b className="text-white">{user ? fmtPeso(user.total_income) : "—"}</b></span>
-          </div>
-          {!user && (
-            <Link to="/login" className="mt-2 inline-block text-xs font-bold underline">Sign in to see your balance →</Link>
-          )}
-        </div>
       </header>
 
-      <main className="relative z-10 -mt-16 space-y-5 px-4">
+      <main className="relative z-10 -mt-12 space-y-5 px-4">
         {/* Hero banner */}
         <section className="overflow-hidden rounded-3xl shadow-[0_10px_40px_-10px_rgba(221,29,33,0.25)]">
           <div className="relative aspect-[16/9] w-full">
