@@ -4,6 +4,7 @@ import { Wallet, Shield, Zap, Gift, Smartphone, Check } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
 import { useAuth } from "@/lib/auth";
 import { fmtPeso, uPost } from "@/lib/user-api";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/recharge")({
   head: () => ({
@@ -32,13 +33,13 @@ function RechargePage() {
   const submit = async () => {
     if (!user) { navigate({ to: "/login" }); return; }
     const amt = Number(amount);
-    if (!amt || amt < 100) { alert("Minimum recharge ₱100"); return; }
+    if (!amt || amt < 100) { toast.error("Minimum recharge is ₱100"); return; }
     setLoading(true);
     try {
       await uPost("/api/u/recharge", { amount: amt, gateway: method });
-      alert("Recharge request submitted. Awaiting admin confirmation.");
+      toast.success("Recharge request submitted", { description: "Awaiting admin confirmation." });
       navigate({ to: "/transactions" });
-    } catch (e) { alert((e as Error).message); }
+    } catch (e) { toast.error((e as Error).message); }
     finally { setLoading(false); }
   };
 
