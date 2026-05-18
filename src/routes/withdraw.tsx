@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { CreditCard, Landmark, History, ChevronRight, Shield, Clock, Info } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { useAuth } from "@/lib/auth";
+import { fmtPeso, uPost } from "@/lib/user-api";
 
 export const Route = createFileRoute("/withdraw")({
   head: () => ({
@@ -14,20 +16,45 @@ export const Route = createFileRoute("/withdraw")({
 });
 
 const PRESETS = [100, 500, 1000, 2000, 5000];
-const FEE_PCT = 2; // 2% service fee
+const FEE_PCT = 5;
 
 function WithdrawPage() {
+  const navigate = useNavigate();
+  const { user, refresh } = useAuth();
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
   const n = Number(amount) || 0;
   const fee = +(n * FEE_PCT / 100).toFixed(2);
   const receive = +(n - fee).toFixed(2);
+
+  const submit = async () => {
+    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user.withdraw_account_no || !user.withdraw_channel) {
+      alert("Please add a withdrawal account first."); navigate({ to: "/add-bank" }); return;
+    }
+    if (n < 100) { alert("Minimum ₱100"); return; }
+    if (Number(user.balance) < n) { alert("Insufficient balance"); return; }
+    setLoading(true);
+    try {
+      await uPost("/api/u/withdraw", {
+        amount: n,
+        channel: user.withdraw_channel,
+        account_no: user.withdraw_account_no,
+        account_name: user.withdraw_account_name,
+      });
+      await refresh();
+      alert("Withdrawal requested. Awaiting admin approval.");
+      navigate({ to: "/withdrawals" });
+    } catch (e) { alert((e as Error).message); }
+    finally { setLoading(false); }
+  };
 
   return (
     <SubPage title="Withdraw" icon={<CreditCard size={26} className="text-white" />} subtitle="Cash out your earnings to GCash or PayMaya">
       <section className="space-y-4">
         <div className="rounded-3xl bg-gradient-to-br from-shell-yellow-soft to-white p-5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)] ring-1 ring-black/5">
           <div className="text-[11px] font-bold tracking-wider text-muted-foreground">AVAILABLE TO WITHDRAW</div>
-          <div className="mt-1 text-3xl font-extrabold text-shell-green">₱358.00</div>
+          <div className="mt-1 text-3xl font-extrabold text-shell-green">{user ? fmtPeso(user.balance) : "—"}</div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
             <Clock size={11} /> Cut-off 9:00 PM · Paid out within 24h
           </div>
