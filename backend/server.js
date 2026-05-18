@@ -33,9 +33,17 @@ const crud = require('./routes/_crud');
 
 app.use('/api/plans', crud({
   table: 'plans',
-  columns: ['name','price','daily_income','total_days','total_income','image_url','description','active'],
+  columns: ['name','type','price','daily_income','total_days','total_income','image_url','description','active'],
   searchCols: ['name'],
+  filterCols: ['active','type'],
+}));
+
+app.use('/api/sliders', crud({
+  table: 'sliders',
+  columns: ['title','image_url','link_url','sort_order','active'],
+  searchCols: ['title'],
   filterCols: ['active'],
+  orderBy: 'sort_order ASC, id DESC',
 }));
 
 app.use('/api/transactions', crud({

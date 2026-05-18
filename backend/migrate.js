@@ -30,6 +30,17 @@ const DEFAULT_SETTINGS = [
     for (const s of statements) await conn.query(s);
     console.log('✓ Schema created');
 
+    // idempotent ALTERs for existing installs
+    const safeAlter = async (sql) => {
+      try { await conn.query(sql); }
+      catch (e) {
+        if (!/Duplicate column|already exists|check that column.*exists/i.test(e.message)) throw e;
+      }
+    };
+    await safeAlter("ALTER TABLE plans ADD COLUMN type ENUM('normal','vip') NOT NULL DEFAULT 'normal' AFTER name");
+    await safeAlter("ALTER TABLE plans ADD INDEX idx_plans_type (type)");
+    console.log('✓ ALTERs applied');
+
     // seed default admin
     const email = process.env.DEFAULT_ADMIN_EMAIL || 'admin@shell.com';
     const password = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
