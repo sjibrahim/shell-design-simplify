@@ -21,7 +21,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!getUserToken()) { setUser(null); return; }
     setLoading(true);
     try { setUser(await fetchMe()); }
-    catch { setUser(null); }
+    catch (e) {
+      // Only sign out on explicit auth failure (token cleared by user-api on 401).
+      // Network / CORS / 5xx must NOT log the user out — keep cached session.
+      if (!getUserToken()) setUser(null);
+    }
     finally { setLoading(false); }
   }, []);
 

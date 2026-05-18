@@ -45,19 +45,9 @@ app.use('/api/transactions', crud({
   filterCols: ['type','status','user_id'],
 }));
 
-app.use('/api/withdrawals', crud({
-  table: 'withdrawals',
-  columns: ['user_id','amount','fee','net_amount','channel','account_no','account_name','status','ref_no','note'],
-  searchCols: ['account_no','account_name','ref_no'],
-  filterCols: ['status','channel','user_id'],
-}));
-
-app.use('/api/recharges', crud({
-  table: 'recharges',
-  columns: ['user_id','amount','gateway','ref_no','status','note'],
-  searchCols: ['gateway','ref_no'],
-  filterCols: ['status','gateway','user_id'],
-}));
+const adminFinance = require('./routes/admin-finance');
+app.use('/api/withdrawals', adminFinance.withdrawals);
+app.use('/api/recharges',   adminFinance.recharges);
 
 app.use('/api/payouts', crud({
   table: 'payouts',
