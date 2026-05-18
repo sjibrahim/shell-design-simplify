@@ -13,20 +13,22 @@ export const Route = createFileRoute("/leaderboard")({
   component: LeaderboardPage,
 });
 
-type Row = { rank: number; name: string; team: number; earned: number };
+type Row = { rank: number; name: string; team: number; earned: number; seed: string };
 
 const MONTHLY: Row[] = [
-  { rank: 1, name: "Carlos M.", team: 412, earned: 184500 },
-  { rank: 2, name: "Maria S.",  team: 365, earned: 162300 },
-  { rank: 3, name: "Jose L.",   team: 298, earned: 128900 },
-  { rank: 4, name: "Anna R.",   team: 245, earned: 98200 },
-  { rank: 5, name: "Pedro G.",  team: 221, earned: 87400 },
-  { rank: 6, name: "Lisa T.",   team: 188, earned: 71200 },
-  { rank: 7, name: "Mark D.",   team: 165, earned: 64500 },
-  { rank: 8, name: "Sofia P.",  team: 152, earned: 58900 },
-  { rank: 9, name: "Juan D.",   team: 155, earned: 22265 },
-  { rank: 10, name: "Eric V.",  team: 138, earned: 49800 },
+  { rank: 1, name: "Carlos M.", team: 412, earned: 184500, seed: "carlos" },
+  { rank: 2, name: "Maria S.",  team: 365, earned: 162300, seed: "maria" },
+  { rank: 3, name: "Jose L.",   team: 298, earned: 128900, seed: "jose" },
+  { rank: 4, name: "Anna R.",   team: 245, earned: 98200,  seed: "anna" },
+  { rank: 5, name: "Pedro G.",  team: 221, earned: 87400,  seed: "pedro" },
+  { rank: 6, name: "Lisa T.",   team: 188, earned: 71200,  seed: "lisa" },
+  { rank: 7, name: "Mark D.",   team: 165, earned: 64500,  seed: "mark" },
+  { rank: 8, name: "Sofia P.",  team: 152, earned: 58900,  seed: "sofia" },
+  { rank: 9, name: "Juan D.",   team: 155, earned: 22265,  seed: "juan" },
+  { rank: 10, name: "Eric V.",  team: 138, earned: 49800,  seed: "eric" },
 ];
+
+const avatarUrl = (seed: string) => `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=ffd54f,ffb74d,ff8a65,e57373,f48fb1,ce93d8,9fa8da,90caf9,80deea,80cbc4,a5d6a7`;
 
 const WEEKLY: Row[] = MONTHLY.map((r) => ({ ...r, team: Math.round(r.team / 4), earned: Math.round(r.earned / 4) }));
 
