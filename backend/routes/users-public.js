@@ -106,8 +106,13 @@ router.post('/change-password', userAuth, async (req, res) => {
 });
 
 // ===== Plans (public list) =====
-router.get('/plans', async (_req, res) => {
-  const [rows] = await pool.query('SELECT id, name, price, daily_income, total_days, total_income, image_url FROM plans WHERE active = 1 ORDER BY price ASC');
+router.get('/plans', async (req, res) => {
+  const { type } = req.query;
+  const params = [];
+  let sql = 'SELECT id, name, type, price, daily_income, total_days, total_income, image_url FROM plans WHERE active = 1';
+  if (type === 'normal' || type === 'vip') { sql += ' AND type = ?'; params.push(type); }
+  sql += ' ORDER BY price ASC';
+  const [rows] = await pool.query(sql, params);
   res.json({ ok: true, items: rows });
 });
 

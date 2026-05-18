@@ -5,6 +5,11 @@ import { SubPage } from "@/components/SubPage";
 import { uGet, fmtPeso } from "@/lib/user-api";
 
 export const Route = createFileRoute("/team-view")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    level: s.level === 1 || s.level === 2 || s.level === 3 || s.level === "1" || s.level === "2" || s.level === "3"
+      ? (Number(s.level) as 1 | 2 | 3)
+      : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Team Members — Shell Oil" },
@@ -23,7 +28,8 @@ const statusStyle = {
 };
 
 function TeamViewPage() {
-  const [tab, setTab] = useState<"all" | 1 | 2 | 3>("all");
+  const { level } = Route.useSearch();
+  const [tab, setTab] = useState<"all" | 1 | 2 | 3>(level ?? "all");
   const [q, setQ] = useState("");
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
