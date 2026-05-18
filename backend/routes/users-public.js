@@ -269,10 +269,21 @@ router.get('/team', userAuth, async (req, res) => {
   const commByLevel = { 1: 0, 2: 0, 3: 0 };
   cRows.forEach(r => { commByLevel[r.level] = Number(r.total); });
 
+  // Commission rates from settings
+  const [sRows] = await pool.query(
+    "SELECT k, v FROM settings WHERE k IN ('commission_l1','commission_l2','commission_l3')"
+  );
+  const sMap = Object.fromEntries(sRows.map(r => [r.k, Number(r.v)]));
+  const rates = {
+    1: Number(sMap.commission_l1 || 0),
+    2: Number(sMap.commission_l2 || 0),
+    3: Number(sMap.commission_l3 || 0),
+  };
+
   const stats = [
-    { level: 1, count: l1.length, recharge: sum(l1), commission: commByLevel[1] },
-    { level: 2, count: l2.length, recharge: sum(l2), commission: commByLevel[2] },
-    { level: 3, count: l3.length, recharge: sum(l3), commission: commByLevel[3] },
+    { level: 1, count: l1.length, recharge: sum(l1), commission: commByLevel[1], rate: rates[1] },
+    { level: 2, count: l2.length, recharge: sum(l2), commission: commByLevel[2], rate: rates[2] },
+    { level: 3, count: l3.length, recharge: sum(l3), commission: commByLevel[3], rate: rates[3] },
   ];
   res.json({
     ok: true,
