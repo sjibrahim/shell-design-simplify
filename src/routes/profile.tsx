@@ -31,11 +31,11 @@ export const Route = createFileRoute("/profile")({
 });
 
 const menu = [
-  { icon: Building2, label: "About Company", desc: "Shell Pilipinas overview", to: "/" },
+  { icon: Building2, label: "About Company", desc: "Shell Pilipinas overview", to: "/about" },
   { icon: FileText, label: "Income Record", desc: "Daily earnings history", to: "/income-details" },
   { icon: ArrowDownToLine, label: "Withdraw Record", desc: "Bank transfer history", to: "/withdraw" },
-  { icon: Ticket, label: "Redeem Code", desc: "Use a promo code", to: "/" },
-  { icon: Download, label: "App Download", desc: "Get the latest version", to: "/" },
+  { icon: Ticket, label: "Redeem Code", desc: "Use a promo code", to: "/redeem" },
+  { icon: Download, label: "App Download", desc: "Get the latest version", to: "/app-download" },
 ] as const;
 
 function ProfilePage() {
