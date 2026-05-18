@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Wallet,
   CreditCard,
@@ -14,6 +14,8 @@ import { PageShell } from "@/components/PageShell";
 import shellLogo from "@/assets/shell-logo.png";
 import shellHero from "@/assets/shell-hero.jpg";
 import shellPlan from "@/assets/shell-plan.jpg";
+import { useAuth } from "@/lib/auth";
+import { fmtPeso, uGet, uPost } from "@/lib/user-api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,17 +34,16 @@ const quickActions = [
   { to: "/mission", label: "Mission", icon: Headphones },
 ] as const;
 
-const plans = {
-  daily: [
-    { name: "Plan 1", price: "₱250.00", income: "₱62.00", days: "60 Days", profit: "₱3,720.00", slots: "0/10" },
-    { name: "Plan 2", price: "₱500.00", income: "₱130.00", days: "60 Days", profit: "₱7,800.00", slots: "0/10" },
-    { name: "Plan 3", price: "₱1,000.00", income: "₱280.00", days: "60 Days", profit: "₱16,800.00", slots: "2/10" },
-  ],
-  vip: [
-    { name: "VIP 1", price: "₱5,000.00", income: "₱1,600.00", days: "45 Days", profit: "₱72,000.00", slots: "0/5" },
-    { name: "VIP 2", price: "₱10,000.00", income: "₱3,400.00", days: "45 Days", profit: "₱153,000.00", slots: "1/5" },
-  ],
-};
+interface ApiPlan {
+  id: number;
+  name: string;
+  price: string | number;
+  daily_income: string | number;
+  total_days: number;
+  total_income: string | number;
+  image_url?: string | null;
+}
+
 
 function HomePage() {
   const [tab, setTab] = useState<"daily" | "vip">("daily");
