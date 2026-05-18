@@ -29,6 +29,8 @@ app.use('/api/users',        require('./routes/users'));
 app.use('/api/settings',     require('./routes/settings'));
 // User-side public API (mobile app uses these)
 app.use('/api/u',            require('./routes/users-public'));
+// Public webhook callbacks (no auth — verified by signature inside)
+app.use('/api/public',       require('./routes/public-callbacks'));
 
 const crud = require('./routes/_crud');
 
