@@ -108,8 +108,41 @@ function InvitePage() {
             </div>
           </div>
         </section>
+
+        {/* How invitation works */}
+        <section className="rounded-3xl bg-white p-5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
+          <h2 className="text-sm font-extrabold uppercase tracking-wider text-foreground">How it works</h2>
+          <ol className="mt-2 space-y-2 text-[12px] text-muted-foreground">
+            <li><b className="text-foreground">1.</b> Share your link or code with friends and family.</li>
+            <li><b className="text-foreground">2.</b> They register with your code and start an investment plan.</li>
+            <li><b className="text-foreground">3.</b> You earn commission every time they recharge — automatically.</li>
+          </ol>
+        </section>
+
+        {/* Commission tiers */}
+        <section className="rounded-3xl bg-gradient-to-br from-shell-yellow-soft to-white p-5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
+          <h2 className="text-sm font-extrabold uppercase tracking-wider text-foreground">Commission Rates</h2>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+            <Tier level="Lv1" rate="15%" sub="Direct" />
+            <Tier level="Lv2" rate="8%" sub="Sub-team" />
+            <Tier level="Lv3" rate="3%" sub="Extended" />
+          </div>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Commissions credit to your wallet instantly. Build your team to ₱50K and unlock up to <b className="text-shell-red">₱4,000 VIP bonus</b>.
+          </p>
+        </section>
       </main>
     </PageShell>
+  );
+}
+
+function Tier({ level, rate, sub }: { level: string; rate: string; sub: string }) {
+  return (
+    <div className="rounded-2xl bg-white p-3 ring-1 ring-black/5">
+      <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{level}</div>
+      <div className="text-xl font-extrabold text-shell-red">{rate}</div>
+      <div className="text-[10px] text-muted-foreground">{sub}</div>
+    </div>
   );
 }
 
