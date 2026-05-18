@@ -117,7 +117,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <AuthGate>
+          <Outlet />
+        </AuthGate>
         <ActivityPopup />
       </AuthProvider>
     </QueryClientProvider>
