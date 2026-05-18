@@ -33,7 +33,7 @@ const crud = require('./routes/_crud');
 
 app.use('/api/plans', crud({
   table: 'plans',
-  columns: ['name','price','daily_income','total_days','total_income','image_url','active'],
+  columns: ['name','price','daily_income','total_days','total_income','image_url','description','active'],
   searchCols: ['name'],
   filterCols: ['active'],
 }));
