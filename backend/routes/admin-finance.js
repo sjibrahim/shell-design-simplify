@@ -149,28 +149,54 @@ withdrawals.post('/', async (req, res) => {
 
 withdrawals.put('/:id', async (req, res) => {
   const id = req.params.id;
+  const payoutVia = req.body.payout_via; // 'manual' | 'WatchPay' | 'HeyPay'
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
     const [rows] = await conn.query('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
     const row = rows[0];
     if (!row) { await conn.rollback(); return res.status(404).json({ error: 'Not found' }); }
-    const newStatus = req.body.status === 'paid' ? 'success' : (req.body.status || row.status);
-    const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
+    let newStatus = req.body.status === 'paid' ? 'success' : (req.body.status || row.status);
+    let newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
     const newNote = req.body.note !== undefined ? req.body.note : row.note;
-    await conn.query(
-      'UPDATE withdrawals SET status=?, ref_no=?, note=? WHERE id=?',
-      [newStatus, newRef, newNote, id]
-    );
     const wasOpen = ['pending', 'processing'].includes(row.status);
-    // Mark paid out -> transaction success (balance already deducted at request time)
+
+    // Gateway-driven payout — only when approving an open request
+    if (wasOpen && newStatus === 'success' && (payoutVia === 'WatchPay' || payoutVia === 'HeyPay')) {
+      const host = `${req.protocol}://${req.get('host')}`;
+      const notifyPath = payoutVia === 'WatchPay' ? '/api/public/watchpay/payout-callback' : '/api/public/heypay/payout-callback';
+      const r = await createPayout(payoutVia, {
+        orderId: id,
+        amount: row.net_amount || row.amount,
+        channel: row.channel,
+        accountNo: row.account_no,
+        accountName: row.account_name,
+        notifyUrl: host + notifyPath,
+      });
+      if (!r.ok) { await conn.rollback(); return res.status(502).json({ error: r.error || 'Gateway payout failed' }); }
+      if (r.manual) {
+        newStatus = 'processing';
+      } else {
+        newStatus = 'processing'; // wait for gateway callback to mark success
+        if (r.ref_no) newRef = r.ref_no;
+      }
+      await conn.query('UPDATE withdrawals SET status=?, ref_no=?, note=?, channel=? WHERE id=?',
+        [newStatus, newRef, newNote, payoutVia, id]);
+      await conn.commit();
+      return res.json({ ok: true, payout: r });
+    }
+
+    await conn.query('UPDATE withdrawals SET status=?, ref_no=?, note=? WHERE id=?',
+      [newStatus, newRef, newNote, id]);
+
+    // Manual approve -> mark transaction success (balance already deducted at request time)
     if (wasOpen && ['success', 'paid'].includes(newStatus)) {
       await conn.query(
         `UPDATE transactions SET status='success' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`,
         [row.user_id, `Withdraw #${id}`]
       );
     }
-    // Failed -> refund the user's wallet (return the full amount)
+    // Failed -> refund
     if (wasOpen && newStatus === 'failed') {
       await conn.query(
         'UPDATE users SET balance = balance + ?, total_withdraw = GREATEST(total_withdraw - ?, 0) WHERE id = ?',
