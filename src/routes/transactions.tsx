@@ -32,7 +32,17 @@ const statusStyle = {
 
 function TransactionsPage() {
   const [tab, setTab] = useState<"all" | Tx["type"]>("all");
-  const list = TXS.filter((t) => tab === "all" || t.type === tab);
+  const [items, setItems] = useState<Tx[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    uGet<{ ok: true; items: Tx[] }>("/api/u/transactions")
+      .then((r) => setItems(r.items || []))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const list = items.filter((t) => tab === "all" || t.type === tab);
 
   return (
     <SubPage title="Transactions" icon={<Receipt size={26} className="text-white" />} subtitle="All activity across your account">
