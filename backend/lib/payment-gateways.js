@@ -36,6 +36,7 @@ async function getGatewayConfig(name) {
   return {
     name,
     endpoint,
+    payoutUrl: def.payoutUrl,
     notifyPath: def.notifyPath,
     merchantId: row.merchant_id,
     secret,
