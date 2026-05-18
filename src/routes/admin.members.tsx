@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ResourcePage, StatusBadge } from "@/components/ResourcePage";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Eye, Network, X } from "lucide-react";
 import { apiGet } from "@/lib/admin-api";
 
@@ -62,7 +62,7 @@ function MembersPage() {
   );
 }
 
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}><div className="max-h-[85vh] w-full max-w-4xl overflow-auto rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}><div className="mb-3 flex items-center justify-between"><h2 className="font-extrabold">{title}</h2><button onClick={onClose}><X size={18} /></button></div>{children}</div></div>;
 }
 
