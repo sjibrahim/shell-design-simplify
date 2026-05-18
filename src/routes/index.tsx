@@ -95,6 +95,7 @@ function HomePage() {
           >
             <Bell size={20} />
           </Link>
+        </div>
       </header>
 
       <main className="relative z-10 -mt-12 space-y-5 px-4">
