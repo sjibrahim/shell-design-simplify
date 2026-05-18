@@ -123,14 +123,19 @@ function WithdrawPage() {
             </div>
           )}
 
-          <div className="mt-4 text-[11px] font-bold tracking-wider text-muted-foreground">WITHDRAWAL PASSWORD</div>
-          <input
-            type="password"
-            placeholder="Enter withdrawal password"
-            className="mt-2 w-full rounded-2xl border border-border bg-secondary/40 px-4 py-4 text-base text-foreground outline-none focus:border-shell-red"
-          />
-          <button className="mt-5 w-full rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-4 text-base font-bold text-white shadow-md active:scale-[0.99]">
-            Request Withdrawal
+          <div className="mt-4 rounded-xl bg-muted/60 p-3 text-[11px] text-muted-foreground">
+            Withdrawing to: <b className="text-foreground">{user?.withdraw_channel || "—"}</b>
+            {user?.withdraw_account_no ? ` · ${user.withdraw_account_no}` : ""}
+            {!user?.withdraw_account_no && (
+              <> · <Link to="/add-bank" className="font-bold text-shell-red underline">Add account</Link></>
+            )}
+          </div>
+          <button
+            disabled={loading}
+            onClick={submit}
+            className="mt-5 w-full rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-4 text-base font-bold text-white shadow-md active:scale-[0.99] disabled:opacity-60"
+          >
+            {loading ? "Submitting…" : "Request Withdrawal"}
           </button>
         </div>
 
