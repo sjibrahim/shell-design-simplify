@@ -18,9 +18,9 @@ const REFERRAL_CODE = "SHL821047";
 const REFERRAL_LINK = `https://shelloil-rewards.live/home/register?invite=${REFERRAL_CODE}`;
 
 const levels = [
-  { n: 1, label: "Level 1", sub: "Direct invites", rate: "15%", rebate: "₱0.00", qty: 7,   dot: "bg-shell-red",     ring: "ring-shell-red/30",    badge: "bg-shell-red text-white" },
-  { n: 2, label: "Level 2", sub: "Sub-team",       rate: "8%",  rebate: "₱0.00", qty: 14,  dot: "bg-shell-amber",   ring: "ring-shell-amber/30",  badge: "bg-shell-amber text-white" },
-  { n: 3, label: "Level 3", sub: "Extended",       rate: "3%",  rebate: "₱0.00", qty: 134, dot: "bg-shell-green",   ring: "ring-shell-green/30",  badge: "bg-shell-green text-white" },
+  { n: 1, label: "Level 1", sub: "Direct invites", rate: "15%", rebate: "₱0.00", qty: 7,   dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5" },
+  { n: 2, label: "Level 2", sub: "Sub-team",       rate: "8%",  rebate: "₱0.00", qty: 14,  dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5" },
+  { n: 3, label: "Level 3", sub: "Extended",       rate: "3%",  rebate: "₱0.00", qty: 134, dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5" },
 ];
 
 function TeamPage() {
