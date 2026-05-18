@@ -77,7 +77,7 @@ function WithdrawalsPage() {
           <div className="relative flex items-center justify-between">
             <div>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">Total Received</div>
-              <div className="mt-1 text-3xl font-extrabold">₱{totalPaid.toLocaleString()}.00</div>
+              <div className="mt-1 text-3xl font-extrabold">{fmtPeso(totalPaid)}</div>
               <div className="mt-1 text-[11px] text-white/80">From {successCount} successful payouts</div>
             </div>
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/30">
@@ -85,7 +85,7 @@ function WithdrawalsPage() {
             </div>
           </div>
           <div className="relative mt-4 grid grid-cols-3 divide-x divide-white/20 rounded-2xl bg-white/10 py-3 text-center">
-            <MiniStat label="Requests" value={String(RECORDS.length)} />
+            <MiniStat label="Requests" value={String(records.length)} />
             <MiniStat label="Pending" value={String(pendingCount)} accent />
             <MiniStat label="Volume" value={`₱${(totalReq / 1000).toFixed(1)}k`} />
           </div>
