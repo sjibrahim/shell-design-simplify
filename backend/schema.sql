@@ -1,0 +1,139 @@
+-- Shell Admin schema (MySQL 8+)
+SET NAMES utf8mb4;
+
+CREATE TABLE IF NOT EXISTS admins (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(120) NOT NULL DEFAULT 'Admin',
+  role ENUM('admin','superadmin') NOT NULL DEFAULT 'admin',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  phone VARCHAR(32) NOT NULL UNIQUE,
+  name VARCHAR(120) DEFAULT NULL,
+  password_hash VARCHAR(255) DEFAULT NULL,
+  balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  total_recharge DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  total_withdraw DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  total_income DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  referrer_id INT DEFAULT NULL,
+  vip_level TINYINT NOT NULL DEFAULT 0,
+  status ENUM('active','inactive','blocked') NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_users_status (status),
+  INDEX idx_users_referrer (referrer_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS plans (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  price DECIMAL(12,2) NOT NULL,
+  daily_income DECIMAL(12,2) NOT NULL,
+  total_days INT NOT NULL,
+  total_income DECIMAL(12,2) NOT NULL,
+  image_url VARCHAR(500) DEFAULT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  type ENUM('recharge','withdraw','income','bonus','commission','plan_purchase','redeem') NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  status ENUM('pending','processing','success','failed') NOT NULL DEFAULT 'pending',
+  note VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_tx_user (user_id),
+  INDEX idx_tx_type (type),
+  INDEX idx_tx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS withdrawals (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  fee DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  net_amount DECIMAL(12,2) NOT NULL,
+  channel VARCHAR(60) NOT NULL DEFAULT 'GCash',
+  account_no VARCHAR(120) NOT NULL,
+  account_name VARCHAR(120) DEFAULT NULL,
+  status ENUM('pending','processing','success','failed') NOT NULL DEFAULT 'pending',
+  ref_no VARCHAR(80) DEFAULT NULL,
+  note VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_wd_user (user_id),
+  INDEX idx_wd_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS recharges (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  gateway VARCHAR(60) NOT NULL DEFAULT 'WatchPay',
+  ref_no VARCHAR(80) DEFAULT NULL,
+  status ENUM('pending','processing','success','failed') NOT NULL DEFAULT 'pending',
+  note VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_rc_user (user_id),
+  INDEX idx_rc_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS payouts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  kind ENUM('blogger','investor') NOT NULL DEFAULT 'blogger',
+  amount DECIMAL(12,2) NOT NULL,
+  status ENUM('pending','processing','success','failed') NOT NULL DEFAULT 'pending',
+  note VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_po_user (user_id),
+  INDEX idx_po_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS rewards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT DEFAULT NULL,
+  kind ENUM('single','multi','agent') NOT NULL DEFAULT 'single',
+  title VARCHAR(190) NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  note VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_rw_kind (kind)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS redeem_codes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(60) NOT NULL UNIQUE,
+  amount DECIMAL(12,2) NOT NULL,
+  max_uses INT NOT NULL DEFAULT 1,
+  uses INT NOT NULL DEFAULT 0,
+  expires_at DATETIME DEFAULT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS gateways (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  type ENUM('recharge','withdraw') NOT NULL DEFAULT 'recharge',
+  name VARCHAR(120) NOT NULL,
+  title VARCHAR(120) NOT NULL,
+  min_amount DECIMAL(12,2) NOT NULL DEFAULT 100,
+  max_amount DECIMAL(12,2) NOT NULL DEFAULT 50000,
+  merchant_id VARCHAR(190) DEFAULT NULL,
+  api_key VARCHAR(255) DEFAULT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS settings (
+  k VARCHAR(80) PRIMARY KEY,
+  v TEXT,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
