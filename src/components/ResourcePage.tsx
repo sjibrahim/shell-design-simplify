@@ -175,6 +175,7 @@ export function ResourcePage(p: ResourcePageProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500">
+                <th className="px-3 py-2"><input type="checkbox" checked={allPageSelected} onChange={toggleAll} aria-label="Select all rows" /></th>
                 <th className="px-3 py-2">ID</th>
                 {p.columns.map((c) => <th key={c.key} className="px-3 py-2">{c.label}</th>)}
                 <th className="px-3 py-2 text-right">Actions</th>
@@ -186,6 +187,7 @@ export function ResourcePage(p: ResourcePageProps) {
               {!loading && !error && items.length === 0 && <tr><td colSpan={p.columns.length + 2} className="px-3 py-8 text-center text-slate-400">No records</td></tr>}
               {!loading && items.map((row) => (
                 <tr key={row.id as number} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="px-3 py-2"><input type="checkbox" checked={selected.includes(row.id as number)} onChange={() => toggleSelected(row.id as number)} aria-label={`Select row ${row.id}`} /></td>
                   <td className="px-3 py-2 font-mono text-xs text-slate-500">{row.id as number}</td>
                   {p.columns.map((c) => (
                     <td key={c.key} className="px-3 py-2">
@@ -194,6 +196,7 @@ export function ResourcePage(p: ResourcePageProps) {
                   ))}
                   <td className="px-3 py-2 text-right">
                     <div className="flex justify-end gap-1">
+                      {p.renderRowActions?.(row, load)}
                       <button onClick={() => setEditing({ mode: "edit", row })} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-shell-red"><Pencil size={14} /></button>
                       <button onClick={() => void remove(row.id as number)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-rose-600"><Trash2 size={14} /></button>
                     </div>
