@@ -26,6 +26,8 @@ app.use('/api/auth',         require('./routes/auth'));
 app.use('/api/dashboard',    require('./routes/dashboard'));
 app.use('/api/users',        require('./routes/users'));
 app.use('/api/settings',     require('./routes/settings'));
+// User-side public API (mobile app uses these)
+app.use('/api/u',            require('./routes/users-public'));
 
 const crud = require('./routes/_crud');
 

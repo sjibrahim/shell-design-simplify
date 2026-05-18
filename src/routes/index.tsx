@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Wallet,
   CreditCard,
@@ -14,6 +14,8 @@ import { PageShell } from "@/components/PageShell";
 import shellLogo from "@/assets/shell-logo.png";
 import shellHero from "@/assets/shell-hero.jpg";
 import shellPlan from "@/assets/shell-plan.jpg";
+import { useAuth } from "@/lib/auth";
+import { fmtPeso, uGet, uPost } from "@/lib/user-api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,20 +34,42 @@ const quickActions = [
   { to: "/mission", label: "Mission", icon: Headphones },
 ] as const;
 
-const plans = {
-  daily: [
-    { name: "Plan 1", price: "₱250.00", income: "₱62.00", days: "60 Days", profit: "₱3,720.00", slots: "0/10" },
-    { name: "Plan 2", price: "₱500.00", income: "₱130.00", days: "60 Days", profit: "₱7,800.00", slots: "0/10" },
-    { name: "Plan 3", price: "₱1,000.00", income: "₱280.00", days: "60 Days", profit: "₱16,800.00", slots: "2/10" },
-  ],
-  vip: [
-    { name: "VIP 1", price: "₱5,000.00", income: "₱1,600.00", days: "45 Days", profit: "₱72,000.00", slots: "0/5" },
-    { name: "VIP 2", price: "₱10,000.00", income: "₱3,400.00", days: "45 Days", profit: "₱153,000.00", slots: "1/5" },
-  ],
-};
+interface ApiPlan {
+  id: number;
+  name: string;
+  price: string | number;
+  daily_income: string | number;
+  total_days: number;
+  total_income: string | number;
+  image_url?: string | null;
+}
+
 
 function HomePage() {
-  const [tab, setTab] = useState<"daily" | "vip">("daily");
+  const navigate = useNavigate();
+  const { user, refresh } = useAuth();
+  const [plans, setPlans] = useState<ApiPlan[]>([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+  const [buying, setBuying] = useState<number | null>(null);
+
+  useEffect(() => {
+    uGet<{ ok: true; items: ApiPlan[] }>("/api/u/plans")
+      .then((r) => setPlans(r.items))
+      .catch(() => setPlans([]))
+      .finally(() => setLoadingPlans(false));
+  }, []);
+
+  const buy = async (p: ApiPlan) => {
+    if (!user) { navigate({ to: "/login" }); return; }
+    if (!confirm(`Purchase ${p.name} for ${fmtPeso(p.price)}?`)) return;
+    setBuying(p.id);
+    try {
+      await uPost("/api/u/buy-plan", { plan_id: p.id });
+      await refresh();
+      alert("Purchase successful!");
+    } catch (e) { alert((e as Error).message); }
+    finally { setBuying(null); }
+  };
 
   return (
     <PageShell>
@@ -67,6 +91,20 @@ function HomePage() {
           >
             <Bell size={20} />
           </Link>
+        </div>
+        {/* Balance */}
+        <div className="relative mt-6 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
+          <div className="text-[11px] font-bold uppercase tracking-widest text-white/80">Wallet Balance</div>
+          <div className="mt-1 text-3xl font-extrabold">
+            {user ? fmtPeso(user.balance) : "—"}
+          </div>
+          <div className="mt-1 flex gap-4 text-[11px] text-white/80">
+            <span>Recharge: <b className="text-white">{user ? fmtPeso(user.total_recharge) : "—"}</b></span>
+            <span>Income: <b className="text-white">{user ? fmtPeso(user.total_income) : "—"}</b></span>
+          </div>
+          {!user && (
+            <Link to="/login" className="mt-2 inline-block text-xs font-bold underline">Sign in to see your balance →</Link>
+          )}
         </div>
       </header>
 
@@ -133,59 +171,51 @@ function HomePage() {
             <h2 className="text-lg font-extrabold text-foreground">Investment Plans</h2>
           </div>
 
-          <div className="mb-4 flex items-center gap-1 rounded-2xl bg-white p-1.5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.12)]">
-            {(["daily", "vip"] as const).map((k) => {
-              const active = tab === k;
-              return (
-                <button
-                  key={k}
-                  onClick={() => setTab(k)}
-                  className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition ${
-                    active ? "bg-shell-red text-white shadow" : "text-muted-foreground"
-                  }`}
+          {loadingPlans ? (
+            <div className="rounded-2xl bg-white p-6 text-center text-sm text-muted-foreground">Loading plans…</div>
+          ) : plans.length === 0 ? (
+            <div className="rounded-2xl bg-white p-6 text-center text-sm text-muted-foreground">
+              No plans available yet. Add some in the admin panel.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {plans.map((p) => (
+                <article
+                  key={p.id}
+                  className="overflow-hidden rounded-3xl bg-white shadow-[0_10px_40px_-12px_rgba(221,29,33,0.18)]"
                 >
-                  {k === "daily" ? "Daily-Income" : "VIP-Income"}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="space-y-4">
-            {plans[tab].map((p) => (
-              <article
-                key={p.name}
-                className="overflow-hidden rounded-3xl bg-white shadow-[0_10px_40px_-12px_rgba(221,29,33,0.18)]"
-              >
-                <div className="relative aspect-[16/10] w-full">
-                  <img
-                    src={shellPlan}
-                    alt={p.name}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    width={1024}
-                    height={640}
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <span className="absolute right-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-shell-red">
-                    {p.slots} Slots
-                  </span>
-                  <div className="absolute bottom-3 left-4 text-2xl font-extrabold text-white drop-shadow">{p.name}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 p-4">
-                  <Stat label="PRICE" value={p.price} />
-                  <Stat label="DAILY INCOME" value={p.income} accent />
-                  <Stat label="DURATION" value={p.days} />
-                  <Stat label="TOTAL PROFIT" value={p.profit} accent />
-                </div>
-                <div className="px-4 pb-4">
-                  <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-3.5 text-base font-bold text-white shadow-md transition active:scale-[0.99]">
-                    <ShoppingCart size={18} />
-                    Purchase Now
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="relative aspect-[16/10] w-full">
+                    <img
+                      src={p.image_url || shellPlan}
+                      alt={p.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      width={1024}
+                      height={640}
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-4 text-2xl font-extrabold text-white drop-shadow">{p.name}</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 p-4">
+                    <Stat label="PRICE" value={fmtPeso(p.price)} />
+                    <Stat label="DAILY INCOME" value={fmtPeso(p.daily_income)} accent />
+                    <Stat label="DURATION" value={`${p.total_days} Days`} />
+                    <Stat label="TOTAL PROFIT" value={fmtPeso(p.total_income)} accent />
+                  </div>
+                  <div className="px-4 pb-4">
+                    <button
+                      disabled={buying === p.id}
+                      onClick={() => buy(p)}
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-3.5 text-base font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-60"
+                    >
+                      <ShoppingCart size={18} />
+                      {buying === p.id ? "Purchasing…" : "Purchase Now"}
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </PageShell>

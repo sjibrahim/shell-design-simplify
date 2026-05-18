@@ -1,4 +1,4 @@
--- Shell Admin schema (MySQL 8+)
+-- Shell Admin + User schema (MySQL 8+)
 SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS admins (
@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS users (
   total_withdraw DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   total_income DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   referrer_id INT DEFAULT NULL,
+  referral_code VARCHAR(20) DEFAULT NULL UNIQUE,
+  withdraw_channel VARCHAR(40) DEFAULT NULL,
+  withdraw_account_no VARCHAR(120) DEFAULT NULL,
+  withdraw_account_name VARCHAR(120) DEFAULT NULL,
   vip_level TINYINT NOT NULL DEFAULT 0,
   status ENUM('active','inactive','blocked') NOT NULL DEFAULT 'active',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -37,6 +41,20 @@ CREATE TABLE IF NOT EXISTS plans (
   image_url VARCHAR(500) DEFAULT NULL,
   active TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_plans (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  plan_id INT NOT NULL,
+  price DECIMAL(12,2) NOT NULL,
+  daily_income DECIMAL(12,2) NOT NULL,
+  total_days INT NOT NULL,
+  days_paid INT NOT NULL DEFAULT 0,
+  status ENUM('active','completed','cancelled') NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_up_user (user_id),
+  INDEX idx_up_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS transactions (
@@ -136,4 +154,13 @@ CREATE TABLE IF NOT EXISTS settings (
   k VARCHAR(80) PRIMARY KEY,
   v TEXT,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS redeem_claims (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  code_id INT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_user_code (user_id, code_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

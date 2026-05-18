@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Wallet, Shield, Zap, Gift, Smartphone, Check } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { useAuth } from "@/lib/auth";
+import { fmtPeso, uPost } from "@/lib/user-api";
 
 export const Route = createFileRoute("/recharge")({
   head: () => ({
@@ -14,25 +16,40 @@ export const Route = createFileRoute("/recharge")({
 });
 
 const METHODS = [
-  { id: "gcash",   name: "GCash",   color: "bg-sky-500" },
-  { id: "paymaya", name: "PayMaya", color: "bg-emerald-500" },
+  { id: "GCash",   name: "GCash",   color: "bg-sky-500" },
+  { id: "PayMaya", name: "PayMaya", color: "bg-emerald-500" },
 ] as const;
 
 const PRESETS = [500, 1000, 2500, 5000, 10000, 20000];
 
 function RechargePage() {
-  const [method, setMethod] = useState<typeof METHODS[number]["id"]>("gcash");
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [method, setMethod] = useState<typeof METHODS[number]["id"]>("GCash");
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    if (!user) { navigate({ to: "/login" }); return; }
+    const amt = Number(amount);
+    if (!amt || amt < 100) { alert("Minimum recharge ₱100"); return; }
+    setLoading(true);
+    try {
+      await uPost("/api/u/recharge", { amount: amt, gateway: method });
+      alert("Recharge request submitted. Awaiting admin confirmation.");
+      navigate({ to: "/transactions" });
+    } catch (e) { alert((e as Error).message); }
+    finally { setLoading(false); }
+  };
 
   return (
     <SubPage title="Recharge" icon={<Wallet size={26} className="text-white" />} subtitle="Top up your Shell Oil balance">
       <section className="space-y-4">
-        {/* Balance + first recharge bonus */}
         <div className="rounded-3xl bg-gradient-to-br from-shell-yellow-soft to-white p-5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)] ring-1 ring-black/5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Current Balance</div>
-              <div className="mt-1 text-3xl font-extrabold text-foreground">₱2,903.00</div>
+              <div className="mt-1 text-3xl font-extrabold text-foreground">{user ? fmtPeso(user.balance) : "—"}</div>
             </div>
             <span className="rounded-full bg-shell-red px-2.5 py-1 text-[10px] font-extrabold text-white">
               <Zap size={10} className="mr-0.5 inline" /> INSTANT
@@ -46,7 +63,6 @@ function RechargePage() {
           </div>
         </div>
 
-        {/* Payment method */}
         <div className="rounded-3xl bg-white p-5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)] ring-1 ring-black/5">
           <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Payment Method</div>
           <div className="mt-3 grid grid-cols-2 gap-3">
@@ -74,7 +90,6 @@ function RechargePage() {
             })}
           </div>
 
-          {/* Amount */}
           <div className="mt-5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Amount</div>
           <input
             value={amount}
@@ -95,8 +110,12 @@ function RechargePage() {
             ))}
           </div>
 
-          <button className="mt-5 w-full rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-4 text-base font-bold text-white shadow-md active:scale-[0.99]">
-            Continue to Pay
+          <button
+            disabled={loading}
+            onClick={submit}
+            className="mt-5 w-full rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-4 text-base font-bold text-white shadow-md active:scale-[0.99] disabled:opacity-60"
+          >
+            {loading ? "Submitting…" : "Continue to Pay"}
           </button>
         </div>
 
