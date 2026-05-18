@@ -1,102 +1,118 @@
+import { MapPin, Phone as PhoneIcon, Mail, User as UserIcon, ChevronDown } from "lucide-react";
 import shellLogo from "@/assets/shell-logo.png";
+import authHero from "@/assets/auth-hero.jpg";
 
 /* =========================================================
-   AuthShell — premium, mobile-first auth layout
-   Soft cream canvas · red arc brand mark · elegant card
+   AuthShell — exact reference layout
+   Dark-red cityscape hero · floating white card · dark footer
    ========================================================= */
-export function AuthShell({
-  title,
-  subtitle,
-  children,
-  footer,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-}) {
+export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#FAF7F2]">
-      {/* Decorative red arc */}
-      <div
-        aria-hidden
-        className="absolute -top-40 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(60%_60%_at_50%_50%,#DD1D21_0%,#A8161A_55%,#5a0c0f_100%)] shadow-[0_30px_80px_-30px_rgba(168,22,26,0.55)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -top-24 left-1/2 h-2 w-[680px] -translate-x-1/2 rounded-full bg-shell-yellow/80 blur-[2px]"
-      />
-
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pt-10 pb-6">
-        {/* Brand mark */}
-        <div className="flex flex-col items-center text-white">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur-sm">
-            <img src={shellLogo} alt="Shell" width={44} height={44} className="h-11 w-11 object-contain" />
+    <div className="min-h-screen w-full bg-[#3a0608]">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-[#3a0608]">
+        {/* HERO */}
+        <section className="relative overflow-hidden text-white">
+          <img
+            src={authHero}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(90,12,15,0.78)_0%,rgba(58,6,8,0.55)_50%,rgba(58,6,8,0.95)_100%)]" />
+          <div className="relative px-6 pb-16 pt-10">
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={shellLogo}
+                alt="Shell"
+                width={96}
+                height={96}
+                className="h-24 w-24 object-contain drop-shadow-[0_8px_22px_rgba(0,0,0,0.55)]"
+              />
+              <h1 className="mt-3 text-[26px] font-extrabold leading-none tracking-[0.02em] text-white">
+                SHELL COMPANY
+              </h1>
+              <div className="mt-3 flex items-center gap-3 text-[12px] font-bold tracking-[0.45em] text-shell-yellow">
+                <span className="h-px w-8 bg-shell-yellow" />
+                PHILIPPINES
+                <span className="h-px w-8 bg-shell-yellow" />
+              </div>
+              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90">
+                Building Trust. Delivering Value.
+              </p>
+            </div>
           </div>
-          <div className="mt-2 text-[11px] font-bold tracking-[0.5em] text-shell-yellow">
-            SHELL · PH
+        </section>
+
+        {/* WHITE CARD — overlaps hero */}
+        <div className="relative -mt-8 flex-1 px-4 pb-8">
+          <div className="rounded-3xl bg-white p-7 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)]">
+            {children}
           </div>
         </div>
 
-        {/* Card */}
-        <div className="mt-7 rounded-3xl bg-white p-6 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.35)] ring-1 ring-black/[0.04]">
-          <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-foreground">
-            {title}
-          </h1>
-          <p className="mt-1 text-[13.5px] text-muted-foreground">{subtitle}</p>
-
-          <div className="mt-6">{children}</div>
-        </div>
-
-        {footer && <div className="mt-5">{footer}</div>}
-
-        <div className="mt-auto pt-8 text-center text-[10px] font-semibold tracking-[0.22em] text-foreground/45">
-          © {new Date().getFullYear()} SHELL COMPANY PHILIPPINES
-        </div>
+        {/* DARK FOOTER */}
+        <ContactFooter />
       </div>
+    </div>
+  );
+}
+
+/* ---------------- footer ---------------- */
+
+function ContactFooter() {
+  return (
+    <div className="bg-[#3a0608] px-5 pb-5 pt-6 text-white">
+      <div className="grid grid-cols-3 items-start gap-2 text-center text-[10.5px] leading-snug text-white/90">
+        <FootItem icon={<MapPin size={18} />} label={<>25th Floor, Ayala<br/>Triangle Gardens<br/>Tower 2, Paseo de<br/>Roxas, Makati City</>} />
+        <FootItem icon={<PhoneIcon size={18} />} label={<>+63 2 8123 4567</>} />
+        <FootItem icon={<Mail size={18} />} label={<>info@shellcompany.ph</>} />
+      </div>
+      <div className="mt-5 border-t border-white/10 pt-3 text-center text-[10.5px] text-white/75">
+        © {new Date().getFullYear()}{" "}
+        <span className="font-bold text-shell-yellow">SHELL COMPANY PHILIPPINES.</span>{" "}
+        ALL RIGHTS RESERVED.
+      </div>
+    </div>
+  );
+}
+
+function FootItem({ icon, label }: { icon: React.ReactNode; label: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 text-shell-yellow ring-1 ring-white/10">
+        {icon}
+      </span>
+      <span className="leading-tight">{label}</span>
     </div>
   );
 }
 
 /* ---------------- form primitives ---------------- */
 
-export function Field({
-  label,
-  icon,
-  children,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
+export function Field({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-[11.5px] font-bold uppercase tracking-[0.14em] text-foreground/60">
-        {label}
-      </span>
-      <div className="group flex items-center gap-2.5 rounded-xl border border-border bg-[#FAFAFA] px-3.5 py-3 transition focus-within:border-shell-red focus-within:bg-white focus-within:ring-4 focus-within:ring-shell-red/10">
-        {icon && <span className="flex h-5 w-5 items-center justify-center text-shell-red">{icon}</span>}
-        {children}
-      </div>
-    </label>
+    <div className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-4 py-4 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition focus-within:border-shell-red/70 focus-within:ring-4 focus-within:ring-shell-red/10">
+      <span className="flex h-6 w-6 items-center justify-center text-shell-red">{icon}</span>
+      {children}
+    </div>
   );
 }
 
 export function PhoneInput({
   value,
   onChange,
-  placeholder = "9XX XXX XXXX",
+  placeholder = "Mobile number",
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
   return (
-    <Field label="Mobile number">
-      <span className="flex items-center gap-1 text-[14.5px] font-extrabold text-shell-red">
-        +63
+    <Field icon={<UserIcon size={22} strokeWidth={2.2} />}>
+      <span className="flex items-center gap-0.5 text-[16px] font-extrabold text-foreground">
+        +63 <ChevronDown size={16} className="text-shell-red" />
       </span>
-      <span className="h-5 w-px bg-border" />
+      <span className="mx-2 h-6 w-px bg-border" />
       <input
         type="tel"
         inputMode="numeric"
@@ -105,39 +121,8 @@ export function PhoneInput({
         placeholder={placeholder}
         required
         autoComplete="tel"
-        className="flex-1 bg-transparent text-[15px] font-medium tracking-wide text-foreground outline-none placeholder:text-muted-foreground/70"
+        className="flex-1 bg-transparent text-[15.5px] font-medium text-foreground outline-none placeholder:text-muted-foreground/80"
       />
     </Field>
-  );
-}
-
-export function PrimaryButton({
-  children,
-  loading,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
-  return (
-    <button
-      {...props}
-      disabled={loading || props.disabled}
-      className="group relative w-full overflow-hidden rounded-xl bg-[linear-gradient(180deg,#E72428_0%,#A8161A_100%)] px-5 py-3.5 text-[14px] font-extrabold tracking-[0.18em] text-white shadow-[0_12px_24px_-10px_rgba(168,22,26,0.55)] transition active:scale-[0.99] disabled:opacity-60"
-    >
-      <span className="absolute inset-x-0 top-0 h-px bg-white/30" />
-      {loading ? "PLEASE WAIT…" : children}
-    </button>
-  );
-}
-
-export function GhostButton({
-  children,
-  ...props
-}: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return (
-    <a
-      {...props}
-      className="flex w-full items-center justify-center gap-2 rounded-xl border border-foreground/10 bg-white px-5 py-3.5 text-[13px] font-bold tracking-[0.18em] text-foreground/80 transition hover:border-shell-red/40 hover:text-shell-red"
-    >
-      {children}
-    </a>
   );
 }
