@@ -260,19 +260,38 @@ router.get('/team', userAuth, async (req, res) => {
   }
   const sum = arr => arr.reduce((s, u) => s + Number(u.total_recharge || 0), 0);
   const withLevel = (arr, level) => arr.map(u => ({ ...u, level }));
+
+  // Real commission totals from commissions table
+  const [cRows] = await pool.query(
+    "SELECT level, COALESCE(SUM(amount),0) AS total FROM commissions WHERE user_id = ? GROUP BY level",
+    [req.uid]
+  );
+  const commByLevel = { 1: 0, 2: 0, 3: 0 };
+  cRows.forEach(r => { commByLevel[r.level] = Number(r.total); });
+
   const stats = [
-    { level: 1, count: l1.length, recharge: sum(l1), commission: 0 },
-    { level: 2, count: l2.length, recharge: sum(l2), commission: 0 },
-    { level: 3, count: l3.length, recharge: sum(l3), commission: 0 },
+    { level: 1, count: l1.length, recharge: sum(l1), commission: commByLevel[1] },
+    { level: 2, count: l2.length, recharge: sum(l2), commission: commByLevel[2] },
+    { level: 3, count: l3.length, recharge: sum(l3), commission: commByLevel[3] },
   ];
   res.json({
     ok: true,
     stats,
     members: [...withLevel(l1, 1), ...withLevel(l2, 2), ...withLevel(l3, 3)],
-    l1: { count: l1.length, recharge: sum(l1), users: l1 },
-    l2: { count: l2.length, recharge: sum(l2), users: l2 },
-    l3: { count: l3.length, recharge: sum(l3), users: l3 },
+    l1: { count: l1.length, recharge: sum(l1), commission: commByLevel[1], users: l1 },
+    l2: { count: l2.length, recharge: sum(l2), commission: commByLevel[2], users: l2 },
+    l3: { count: l3.length, recharge: sum(l3), commission: commByLevel[3], users: l3 },
+    total_commission: commByLevel[1] + commByLevel[2] + commByLevel[3],
   });
+});
+
+router.get('/commissions', userAuth, async (req, res) => {
+  const [rows] = await pool.query(
+    `SELECT c.id, c.level, c.amount, c.base_amount, c.rate, c.created_at,
+            u.phone AS source_phone, u.name AS source_name
+       FROM commissions c LEFT JOIN users u ON u.id = c.source_user_id
+       WHERE c.user_id = ? ORDER BY c.id DESC LIMIT 200`, [req.uid]);
+  res.json({ ok: true, items: rows });
 });
 
 // ===== Redeem code =====
