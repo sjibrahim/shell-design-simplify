@@ -135,9 +135,10 @@ withdrawals.post('/', async (req, res) => {
   if (!user_id || !amount) return res.status(400).json({ error: 'user_id and amount required' });
   const fee = +(Number(amount) * 0.05).toFixed(2);
   const net = +(Number(amount) - fee).toFixed(2);
+  const safeStatus = status === 'paid' ? 'success' : (status || 'pending');
   const [r] = await pool.query(
     'INSERT INTO withdrawals (user_id, amount, fee, net_amount, channel, account_no, account_name, status, ref_no, note) VALUES (?,?,?,?,?,?,?,?,?,?)',
-    [user_id, amount, fee, net, channel || method || 'GCash', account_no || account || '', account_name || null, status || 'pending', ref_no || null, note || null]
+    [user_id, amount, fee, net, channel || method || 'GCash', account_no || account || '', account_name || null, safeStatus, ref_no || null, note || null]
   );
   res.json({ ok: true, id: r.insertId });
 });
@@ -150,7 +151,7 @@ withdrawals.put('/:id', async (req, res) => {
     const [rows] = await conn.query('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
     const row = rows[0];
     if (!row) { await conn.rollback(); return res.status(404).json({ error: 'Not found' }); }
-    const newStatus = req.body.status || row.status;
+    const newStatus = req.body.status === 'paid' ? 'success' : (req.body.status || row.status);
     const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
     const newNote = req.body.note !== undefined ? req.body.note : row.note;
     await conn.query(
@@ -189,7 +190,7 @@ withdrawals.delete('/:id', async (req, res) => {
 
 recharges.post('/bulk/status', async (req, res) => {
   const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Boolean) : [];
-  const status = req.body?.status;
+  const status = req.body?.status === 'paid' ? 'success' : req.body?.status;
   if (!ids.length || !['success', 'failed', 'pending', 'processing'].includes(status)) return res.status(400).json({ error: 'Valid ids and status required' });
   let updated = 0;
   for (const id of ids) {
