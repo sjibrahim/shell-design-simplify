@@ -128,15 +128,33 @@ router.post('/recharge', userAuth, async (req, res) => {
   const { amount, gateway } = req.body || {};
   const amt = Number(amount);
   if (!Number.isFinite(amt) || amt <= 0) return res.status(400).json({ error: 'Invalid amount' });
+  const gw = gateway || 'WatchPay';
   const [ins] = await pool.query(
     'INSERT INTO recharges (user_id, amount, gateway, status) VALUES (?,?,?,?)',
-    [req.uid, amt, gateway || 'WatchPay', 'pending']
+    [req.uid, amt, gw, 'pending']
   );
   await pool.query(
     'INSERT INTO transactions (user_id, type, amount, status, note) VALUES (?,?,?,?,?)',
     [req.uid, 'recharge', amt, 'pending', `Recharge #${ins.insertId}`]
   );
-  res.json({ ok: true, id: ins.insertId });
+
+  // Try to initialise online checkout for supported gateways
+  let pay_url = null;
+  if (gw === 'WatchPay' || gw === 'HeyPay') {
+    try {
+      const { createPayment } = require('../lib/payment-gateways');
+      const host = `${req.protocol}://${req.get('host')}`;
+      const notifyPath = gw === 'WatchPay' ? '/api/public/watchpay/callback' : '/api/public/heypay/callback';
+      const result = await createPayment(gw, {
+        orderId: ins.insertId,
+        amount: amt,
+        notifyUrl: host + notifyPath,
+        returnUrl: req.body.return_url || '',
+      });
+      if (result.ok && result.pay_url) pay_url = result.pay_url;
+    } catch (e) { /* fall through to manual */ }
+  }
+  res.json({ ok: true, id: ins.insertId, pay_url });
 });
 
 router.post('/withdraw', userAuth, async (req, res) => {
