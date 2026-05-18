@@ -16,7 +16,7 @@ export const Route = createFileRoute("/team")({
   component: TeamPage,
 });
 
-interface TeamStats { level: 1 | 2 | 3; count: number; commission: number | string }
+interface TeamStats { level: 1 | 2 | 3; count: number; commission?: number | string; recharge?: number | string }
 
 
 function TeamPage() {
@@ -104,14 +104,14 @@ function TeamPage() {
                     <Users size={20} />
                   </div>
                   <div className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Total People</div>
-                  <div className="mt-0.5 text-3xl font-extrabold text-foreground">155</div>
+                  <div className="mt-0.5 text-3xl font-extrabold text-foreground">{levels.reduce((s, l) => s + l.qty, 0)}</div>
                 </div>
                 <div className="flex flex-col items-center px-2">
                   <div className="mb-1.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-shell-yellow/30 text-[#8a6500]">
                     <TrendingUp size={20} />
                   </div>
                   <div className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Total Rebate</div>
-                  <div className="mt-0.5 text-3xl font-extrabold text-shell-red">₱22,265</div>
+                  <div className="mt-0.5 text-3xl font-extrabold text-shell-red">{fmtPeso(stats.reduce((s, l) => s + Number(l.commission || 0), 0))}</div>
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-shell-yellow-soft py-1.5 text-[11px] font-bold text-[#8a6500]">
