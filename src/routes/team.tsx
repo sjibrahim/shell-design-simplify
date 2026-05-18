@@ -18,9 +18,9 @@ const REFERRAL_CODE = "SHL821047";
 const REFERRAL_LINK = `https://shelloil-rewards.live/home/register?invite=${REFERRAL_CODE}`;
 
 const levels = [
-  { n: 1, label: "Level 1", sub: "Direct invites", rate: "15%", rebate: "₱0.00", qty: 7,   dot: "bg-shell-red",     ring: "ring-shell-red/30",    badge: "bg-shell-red text-white" },
-  { n: 2, label: "Level 2", sub: "Sub-team",       rate: "8%",  rebate: "₱0.00", qty: 14,  dot: "bg-shell-amber",   ring: "ring-shell-amber/30",  badge: "bg-shell-amber text-white" },
-  { n: 3, label: "Level 3", sub: "Extended",       rate: "3%",  rebate: "₱0.00", qty: 134, dot: "bg-shell-green",   ring: "ring-shell-green/30",  badge: "bg-shell-green text-white" },
+  { n: 1, label: "Level 1", sub: "Direct invites", rate: "15%", rebate: "₱0.00", qty: 7,   dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5" },
+  { n: 2, label: "Level 2", sub: "Sub-team",       rate: "8%",  rebate: "₱0.00", qty: 14,  dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5" },
+  { n: 3, label: "Level 3", sub: "Extended",       rate: "3%",  rebate: "₱0.00", qty: 134, dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5" },
 ];
 
 function TeamPage() {
@@ -165,32 +165,28 @@ function TeamPage() {
             {levels.map((lv) => (
               <div
                 key={lv.n}
-                className={`relative overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-[0_8px_20px_-14px_rgba(0,0,0,0.2)]`}
+                className="relative overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.18)]"
               >
-                <div className={`absolute left-0 top-0 h-full w-1.5 ${lv.dot}`} />
-                <div className="flex items-center justify-between pl-2">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-white ring-4 ${lv.ring}`}>
-                      <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${lv.dot} text-sm font-extrabold text-white`}>
+                <div className={`absolute left-0 top-0 h-full w-1 ${lv.dot}`} />
+                <div className="flex items-center justify-between gap-3 pl-2">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${lv.tint} ring-2 ${lv.ring}`}>
+                      <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${lv.dot} text-[11px] font-extrabold text-white`}>
                         L{lv.n}
                       </span>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-extrabold text-foreground">{lv.label}</span>
-                        <span className={`rounded-full ${lv.badge} px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide`}>
-                          {lv.rate}
-                        </span>
-                      </div>
-                      <div className="text-[11px] font-semibold text-muted-foreground">{lv.sub}</div>
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-extrabold text-foreground">{lv.label}</div>
+                      <div className="truncate text-[11px] font-semibold text-muted-foreground">{lv.sub}</div>
                     </div>
                   </div>
-                  <button className="flex items-center gap-0.5 rounded-full bg-shell-red/10 px-2.5 py-1 text-[11px] font-bold text-shell-red">
+                  <button className="flex shrink-0 items-center gap-0.5 rounded-full bg-shell-red/10 px-2.5 py-1 text-[11px] font-bold text-shell-red active:scale-95">
                     Details <ArrowUpRight size={12} />
                   </button>
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-muted/60 p-3">
-                  <Cell value={lv.rebate} label="Earned" accent />
+                <div className={`mt-3 grid grid-cols-3 overflow-hidden rounded-xl ${lv.tint} divide-x divide-white`}>
+                  <Cell value={lv.rate} label="Rebate" accent />
+                  <Cell value={lv.rebate} label="Earned" />
                   <Cell value={lv.qty.toString()} label="Members" />
                 </div>
               </div>
@@ -206,8 +202,8 @@ function TeamPage() {
 
 function Cell({ value, label, accent = false }: { value: string; label: string; accent?: boolean }) {
   return (
-    <div className="text-center">
-      <div className={`text-lg font-extrabold leading-tight ${accent ? "text-shell-red" : "text-foreground"}`}>{value}</div>
+    <div className="bg-white/70 px-2 py-2.5 text-center">
+      <div className={`text-base font-extrabold leading-tight ${accent ? "text-shell-red" : "text-foreground"}`}>{value}</div>
       <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</div>
     </div>
   );

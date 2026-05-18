@@ -14,6 +14,7 @@ import { Route as TreasureBoxRouteImport } from './routes/treasure-box'
 import { Route as TestHeadersRouteImport } from './routes/test-headers'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RedeemRouteImport } from './routes/redeem'
 import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MissionRouteImport } from './routes/mission'
@@ -21,6 +22,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as IncomeDetailsRouteImport } from './routes/income-details'
 import { Route as ChannelRouteImport } from './routes/channel'
+import { Route as AppDownloadRouteImport } from './routes/app-download'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WithdrawRoute = WithdrawRouteImport.update({
@@ -46,6 +49,11 @@ const TeamRoute = TeamRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedeemRoute = RedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RechargeRoute = RechargeRouteImport.update({
@@ -83,6 +91,16 @@ const ChannelRoute = ChannelRouteImport.update({
   path: '/channel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppDownloadRoute = AppDownloadRouteImport.update({
+  id: '/app-download',
+  path: '/app-download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -91,6 +109,8 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
@@ -98,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
   '/recharge': typeof RechargeRoute
+  '/redeem': typeof RedeemRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
   '/test-headers': typeof TestHeadersRoute
@@ -106,6 +127,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
@@ -113,6 +136,7 @@ export interface FileRoutesByTo {
   '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
   '/recharge': typeof RechargeRoute
+  '/redeem': typeof RedeemRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
   '/test-headers': typeof TestHeadersRoute
@@ -122,6 +146,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
@@ -129,6 +155,7 @@ export interface FileRoutesById {
   '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
   '/recharge': typeof RechargeRoute
+  '/redeem': typeof RedeemRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
   '/test-headers': typeof TestHeadersRoute
@@ -139,6 +166,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/app-download'
     | '/channel'
     | '/income-details'
     | '/invite'
@@ -146,6 +175,7 @@ export interface FileRouteTypes {
     | '/mission'
     | '/profile'
     | '/recharge'
+    | '/redeem'
     | '/register'
     | '/team'
     | '/test-headers'
@@ -154,6 +184,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/app-download'
     | '/channel'
     | '/income-details'
     | '/invite'
@@ -161,6 +193,7 @@ export interface FileRouteTypes {
     | '/mission'
     | '/profile'
     | '/recharge'
+    | '/redeem'
     | '/register'
     | '/team'
     | '/test-headers'
@@ -169,6 +202,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/app-download'
     | '/channel'
     | '/income-details'
     | '/invite'
@@ -176,6 +211,7 @@ export interface FileRouteTypes {
     | '/mission'
     | '/profile'
     | '/recharge'
+    | '/redeem'
     | '/register'
     | '/team'
     | '/test-headers'
@@ -185,6 +221,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AppDownloadRoute: typeof AppDownloadRoute
   ChannelRoute: typeof ChannelRoute
   IncomeDetailsRoute: typeof IncomeDetailsRoute
   InviteRoute: typeof InviteRoute
@@ -192,6 +230,7 @@ export interface RootRouteChildren {
   MissionRoute: typeof MissionRoute
   ProfileRoute: typeof ProfileRoute
   RechargeRoute: typeof RechargeRoute
+  RedeemRoute: typeof RedeemRoute
   RegisterRoute: typeof RegisterRoute
   TeamRoute: typeof TeamRoute
   TestHeadersRoute: typeof TestHeadersRoute
@@ -234,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redeem': {
+      id: '/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof RedeemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recharge': {
@@ -285,6 +331,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChannelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app-download': {
+      id: '/app-download'
+      path: '/app-download'
+      fullPath: '/app-download'
+      preLoaderRoute: typeof AppDownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -297,6 +357,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AppDownloadRoute: AppDownloadRoute,
   ChannelRoute: ChannelRoute,
   IncomeDetailsRoute: IncomeDetailsRoute,
   InviteRoute: InviteRoute,
@@ -304,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   MissionRoute: MissionRoute,
   ProfileRoute: ProfileRoute,
   RechargeRoute: RechargeRoute,
+  RedeemRoute: RedeemRoute,
   RegisterRoute: RegisterRoute,
   TeamRoute: TeamRoute,
   TestHeadersRoute: TestHeadersRoute,
