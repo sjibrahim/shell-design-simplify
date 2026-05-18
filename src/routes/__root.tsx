@@ -115,8 +115,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <ActivityPopup />
+      <AuthProvider>
+        <Outlet />
+        <ActivityPopup />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
