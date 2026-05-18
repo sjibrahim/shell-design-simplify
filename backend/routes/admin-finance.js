@@ -49,6 +49,7 @@ recharges.post('/', async (req, res) => {
     );
     if (st === 'success') {
       await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id = ?', [amt, amt, user_id]);
+      await creditUplineCommissions(conn, { userId: user_id, amount: amt, rechargeId: r.insertId });
     }
     await conn.commit();
     res.json({ ok: true, id: r.insertId });
