@@ -8,10 +8,12 @@ const pool = require('../db');
 const DEFAULTS = {
   WatchPay: {
     payUrl: 'https://api.watchpay.io/api/pay/create',
+    payoutUrl: 'https://api.watchpay.io/api/payout/create',
     notifyPath: '/api/public/watchpay/callback',
   },
   HeyPay: {
     payUrl: 'https://api.heypay.io/api/pay/create',
+    payoutUrl: 'https://api.heypay.io/api/payout/create',
     notifyPath: '/api/public/heypay/callback',
   },
 };
