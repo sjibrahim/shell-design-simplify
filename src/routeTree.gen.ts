@@ -33,7 +33,17 @@ import { Route as AddBankRouteImport } from './routes/add-bank'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
+import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
+import { Route as AdminRedeemCodesRouteImport } from './routes/admin.redeem-codes'
+import { Route as AdminRechargesRouteImport } from './routes/admin.recharges'
+import { Route as AdminPlansRouteImport } from './routes/admin.plans'
+import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
+import { Route as AdminMembersRouteImport } from './routes/admin.members'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminGatewaysRouteImport } from './routes/admin.gateways'
 
 const WithdrawalsRoute = WithdrawalsRouteImport.update({
   id: '/withdrawals',
@@ -155,9 +165,59 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
+  id: '/withdrawals',
+  path: '/withdrawals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRewardsRoute = AdminRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRedeemCodesRoute = AdminRedeemCodesRouteImport.update({
+  id: '/redeem-codes',
+  path: '/redeem-codes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRechargesRoute = AdminRechargesRouteImport.update({
+  id: '/recharges',
+  path: '/recharges',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlansRoute = AdminPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPayoutsRoute = AdminPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMembersRoute = AdminMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGatewaysRoute = AdminGatewaysRouteImport.update({
+  id: '/gateways',
+  path: '/gateways',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -185,7 +245,17 @@ export interface FileRoutesByFullPath {
   '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
   '/withdrawals': typeof WithdrawalsRoute
+  '/admin/gateways': typeof AdminGatewaysRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/recharges': typeof AdminRechargesRoute
+  '/admin/redeem-codes': typeof AdminRedeemCodesRoute
+  '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -211,7 +281,17 @@ export interface FileRoutesByTo {
   '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
   '/withdrawals': typeof WithdrawalsRoute
+  '/admin/gateways': typeof AdminGatewaysRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/recharges': typeof AdminRechargesRoute
+  '/admin/redeem-codes': typeof AdminRedeemCodesRoute
+  '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -239,7 +319,17 @@ export interface FileRoutesById {
   '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
   '/withdrawals': typeof WithdrawalsRoute
+  '/admin/gateways': typeof AdminGatewaysRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/recharges': typeof AdminRechargesRoute
+  '/admin/redeem-codes': typeof AdminRedeemCodesRoute
+  '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -268,7 +358,17 @@ export interface FileRouteTypes {
     | '/vip-bonus'
     | '/withdraw'
     | '/withdrawals'
+    | '/admin/gateways'
     | '/admin/login'
+    | '/admin/members'
+    | '/admin/payouts'
+    | '/admin/plans'
+    | '/admin/recharges'
+    | '/admin/redeem-codes'
+    | '/admin/rewards'
+    | '/admin/settings'
+    | '/admin/transactions'
+    | '/admin/withdrawals'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -294,7 +394,17 @@ export interface FileRouteTypes {
     | '/vip-bonus'
     | '/withdraw'
     | '/withdrawals'
+    | '/admin/gateways'
     | '/admin/login'
+    | '/admin/members'
+    | '/admin/payouts'
+    | '/admin/plans'
+    | '/admin/recharges'
+    | '/admin/redeem-codes'
+    | '/admin/rewards'
+    | '/admin/settings'
+    | '/admin/transactions'
+    | '/admin/withdrawals'
     | '/admin'
   id:
     | '__root__'
@@ -321,7 +431,17 @@ export interface FileRouteTypes {
     | '/vip-bonus'
     | '/withdraw'
     | '/withdrawals'
+    | '/admin/gateways'
     | '/admin/login'
+    | '/admin/members'
+    | '/admin/payouts'
+    | '/admin/plans'
+    | '/admin/recharges'
+    | '/admin/redeem-codes'
+    | '/admin/rewards'
+    | '/admin/settings'
+    | '/admin/transactions'
+    | '/admin/withdrawals'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -521,6 +641,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/withdrawals': {
+      id: '/admin/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/admin/withdrawals'
+      preLoaderRoute: typeof AdminWithdrawalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/transactions': {
+      id: '/admin/transactions'
+      path: '/transactions'
+      fullPath: '/admin/transactions'
+      preLoaderRoute: typeof AdminTransactionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rewards': {
+      id: '/admin/rewards'
+      path: '/rewards'
+      fullPath: '/admin/rewards'
+      preLoaderRoute: typeof AdminRewardsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/redeem-codes': {
+      id: '/admin/redeem-codes'
+      path: '/redeem-codes'
+      fullPath: '/admin/redeem-codes'
+      preLoaderRoute: typeof AdminRedeemCodesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/recharges': {
+      id: '/admin/recharges'
+      path: '/recharges'
+      fullPath: '/admin/recharges'
+      preLoaderRoute: typeof AdminRechargesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/plans': {
+      id: '/admin/plans'
+      path: '/plans'
+      fullPath: '/admin/plans'
+      preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payouts': {
+      id: '/admin/payouts'
+      path: '/payouts'
+      fullPath: '/admin/payouts'
+      preLoaderRoute: typeof AdminPayoutsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -528,16 +711,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/gateways': {
+      id: '/admin/gateways'
+      path: '/gateways'
+      fullPath: '/admin/gateways'
+      preLoaderRoute: typeof AdminGatewaysRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminGatewaysRoute: typeof AdminGatewaysRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMembersRoute: typeof AdminMembersRoute
+  AdminPayoutsRoute: typeof AdminPayoutsRoute
+  AdminPlansRoute: typeof AdminPlansRoute
+  AdminRechargesRoute: typeof AdminRechargesRoute
+  AdminRedeemCodesRoute: typeof AdminRedeemCodesRoute
+  AdminRewardsRoute: typeof AdminRewardsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTransactionsRoute: typeof AdminTransactionsRoute
+  AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminGatewaysRoute: AdminGatewaysRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMembersRoute: AdminMembersRoute,
+  AdminPayoutsRoute: AdminPayoutsRoute,
+  AdminPlansRoute: AdminPlansRoute,
+  AdminRechargesRoute: AdminRechargesRoute,
+  AdminRedeemCodesRoute: AdminRedeemCodesRoute,
+  AdminRewardsRoute: AdminRewardsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTransactionsRoute: AdminTransactionsRoute,
+  AdminWithdrawalsRoute: AdminWithdrawalsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
