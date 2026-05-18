@@ -52,6 +52,14 @@ const menu = [
 
 function ProfilePage() {
   const [show, setShow] = useState(true);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const displayName = user?.name?.trim() || (user?.phone ? `User ${user.phone.slice(-4)}` : "Guest");
+  const handleLogout = () => {
+    if (!confirm("Sign out of your account?")) return;
+    signOut();
+    navigate({ to: "/login" });
+  };
 
   return (
     <div className="min-h-screen bg-background">
