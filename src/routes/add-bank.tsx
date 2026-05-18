@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Landmark, Shield, Check, Smartphone } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { useAuth } from "@/lib/auth";
+import { uPut } from "@/lib/user-api";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/add-bank")({
   head: () => ({
@@ -19,15 +22,25 @@ const WALLETS = [
 ] as const;
 
 function AddBankPage() {
+  const { user, refresh } = useAuth();
   const [wallet, setWallet] = useState<typeof WALLETS[number]["id"]>("gcash");
-  const [name, setName] = useState("");
-  const [acc, setAcc] = useState("");
+  const [name, setName] = useState(user?.withdraw_account_name || "");
+  const [acc, setAcc] = useState(user?.withdraw_account_no || "");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    if (!name || !acc) return;
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const save = async () => {
+    if (!name.trim() || !acc.trim()) { toast.error("Account name and number required"); return; }
+    setSaving(true);
+    try {
+      const channel = WALLETS.find((w) => w.id === wallet)?.name || "GCash";
+      await uPut("/api/u/me", { withdraw_channel: channel, withdraw_account_no: acc.trim(), withdraw_account_name: name.trim() });
+      await refresh();
+      setSaved(true);
+      toast.success("Payout account saved");
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
   };
 
   return (
@@ -82,9 +95,10 @@ function AddBankPage() {
 
           <button
             onClick={save}
+            disabled={saving}
             className="mt-4 w-full rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-4 text-base font-bold text-white shadow-md active:scale-[0.99]"
           >
-            Save Account
+            {saving ? "Saving…" : "Save Account"}
           </button>
           {saved && (
             <div className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-shell-green/10 px-3 py-2 text-xs font-bold text-shell-green">
