@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Users, Search, Phone } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { uGet, fmtPeso } from "@/lib/user-api";
 
 export const Route = createFileRoute("/team-view")({
   head: () => ({
@@ -13,36 +14,33 @@ export const Route = createFileRoute("/team-view")({
   component: TeamViewPage,
 });
 
-type Member = { id: string; phone: string; level: 1 | 2 | 3; recharge: number; joined: string; status: "active" | "new" | "idle" };
-
-const MEMBERS: Member[] = [
-  { id: "M101", phone: "+63 917-845-2210", level: 1, recharge: 5000,  joined: "2025-05-12", status: "active" },
-  { id: "M102", phone: "+63 949-112-8876", level: 1, recharge: 1000,  joined: "2025-05-10", status: "active" },
-  { id: "M103", phone: "+63 917-664-3392", level: 1, recharge: 250,   joined: "2025-05-09", status: "new" },
-  { id: "M104", phone: "+63 949-723-4421", level: 1, recharge: 10000, joined: "2025-04-30", status: "active" },
-  { id: "M201", phone: "+63 917-228-9911", level: 2, recharge: 500,   joined: "2025-05-08", status: "active" },
-  { id: "M202", phone: "+63 949-456-1122", level: 2, recharge: 0,     joined: "2025-05-06", status: "idle" },
-  { id: "M203", phone: "+63 917-771-3344", level: 2, recharge: 1000,  joined: "2025-05-04", status: "active" },
-  { id: "M301", phone: "+63 949-993-7766", level: 3, recharge: 250,   joined: "2025-05-02", status: "new" },
-  { id: "M302", phone: "+63 917-554-8821", level: 3, recharge: 500,   joined: "2025-04-28", status: "active" },
-  { id: "M303", phone: "+63 949-118-3322", level: 3, recharge: 0,     joined: "2025-04-25", status: "idle" },
-];
+type Member = { id: number | string; phone: string; name?: string | null; level: 1 | 2 | 3; total_recharge: number | string; created_at: string; status: "active" | "inactive" | "blocked" };
 
 const statusStyle = {
   active: "bg-shell-green/15 text-shell-green",
-  new:    "bg-shell-yellow/30 text-[#8a6500]",
-  idle:   "bg-muted text-muted-foreground",
+  inactive: "bg-muted text-muted-foreground",
+  blocked: "bg-shell-red/10 text-shell-red",
 };
 
 function TeamViewPage() {
   const [tab, setTab] = useState<"all" | 1 | 2 | 3>("all");
   const [q, setQ] = useState("");
-  const filtered = MEMBERS.filter((m) =>
-    (tab === "all" || m.level === tab) && (q === "" || m.phone.includes(q) || m.id.toLowerCase().includes(q.toLowerCase()))
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    uGet<{ ok: true; members: Member[] }>("/api/u/team")
+      .then((r) => setMembers(r.members || []))
+      .catch(() => setMembers([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = members.filter((m) =>
+    (tab === "all" || m.level === tab) && (q === "" || m.phone.includes(q) || String(m.id).toLowerCase().includes(q.toLowerCase()) || (m.name || "").toLowerCase().includes(q.toLowerCase()))
   );
 
   return (
-    <SubPage title="Team Members" icon={<Users size={26} className="text-white" />} subtitle={`${MEMBERS.length} total · 3 levels`}>
+    <SubPage title="Team Members" icon={<Users size={26} className="text-white" />} subtitle={`${members.length} total · 3 levels`}>
       <section className="space-y-4">
         {/* Search */}
         <div className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2.5 ring-1 ring-black/5 shadow-sm">
@@ -78,7 +76,8 @@ function TeamViewPage() {
 
         {/* List */}
         <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 shadow-sm">
-          {filtered.length === 0 && (
+          {loading && <div className="px-4 py-10 text-center text-sm text-muted-foreground">Loading…</div>}
+          {!loading && filtered.length === 0 && (
             <div className="px-4 py-10 text-center text-sm text-muted-foreground">No members found.</div>
           )}
           {filtered.map((m, i) => (
@@ -95,11 +94,11 @@ function TeamViewPage() {
                   <span className="truncate">{m.phone}</span>
                 </div>
                 <div className="mt-0.5 text-[11px] text-muted-foreground">
-                  ID {m.id} · joined {m.joined}
+                  ID {m.id} · joined {new Date(m.created_at).toLocaleDateString()}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm font-extrabold text-shell-red">₱{m.recharge.toLocaleString()}</div>
+                <div className="text-sm font-extrabold text-shell-red">{fmtPeso(m.total_recharge)}</div>
                 <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${statusStyle[m.status]}`}>
                   {m.status}
                 </span>

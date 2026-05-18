@@ -4,6 +4,7 @@ import { CreditCard, Landmark, History, ChevronRight, Shield, Clock, Info } from
 import { SubPage } from "@/components/SubPage";
 import { useAuth } from "@/lib/auth";
 import { fmtPeso, uPost } from "@/lib/user-api";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/withdraw")({
   head: () => ({
@@ -30,10 +31,10 @@ function WithdrawPage() {
   const submit = async () => {
     if (!user) { navigate({ to: "/login" }); return; }
     if (!user.withdraw_account_no || !user.withdraw_channel) {
-      alert("Please add a withdrawal account first."); navigate({ to: "/add-bank" }); return;
+      toast.error("Please add a withdrawal account first"); navigate({ to: "/add-bank" }); return;
     }
-    if (n < 100) { alert("Minimum ₱100"); return; }
-    if (Number(user.balance) < n) { alert("Insufficient balance"); return; }
+    if (n < 100) { toast.error("Minimum withdrawal is ₱100"); return; }
+    if (Number(user.balance) < n) { toast.error("Insufficient balance"); return; }
     setLoading(true);
     try {
       await uPost("/api/u/withdraw", {
@@ -43,9 +44,9 @@ function WithdrawPage() {
         account_name: user.withdraw_account_name,
       });
       await refresh();
-      alert("Withdrawal requested. Awaiting admin approval.");
+      toast.success("Withdrawal requested", { description: "Awaiting admin approval." });
       navigate({ to: "/withdrawals" });
-    } catch (e) { alert((e as Error).message); }
+    } catch (e) { toast.error((e as Error).message); }
     finally { setLoading(false); }
   };
 

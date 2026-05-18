@@ -4,12 +4,13 @@ import { AdminCard, PageTitle, StatusBadge } from "./AdminLayout";
 import { apiDelete, apiGet, apiPost, apiPut, type ListResult } from "@/lib/admin-api";
 
 export type FieldType = "text" | "number" | "select" | "textarea";
+type SelectOption = string | number | { label: string; value: string | number };
 
 export interface FieldDef {
   name: string;
   label: string;
   type?: FieldType;
-  options?: string[];           // for select
+  options?: SelectOption[];           // for select
   required?: boolean;
   width?: "full" | "half";
 }
@@ -34,6 +35,8 @@ export interface ResourcePageProps {
   pinnedFilterKey?: string;     // e.g. "status" for the tab strip in withdrawals
   pinnedFilterLabel?: string;
   pinnedFilterOptions?: { value: string; label: string }[];
+  renderRowActions?: (row: Record<string, unknown>, reload: () => void) => React.ReactNode;
+  bulkActions?: { label: string; run: (ids: number[], reload: () => void) => Promise<void> | void; className?: string }[];
 }
 
 export function ResourcePage(p: ResourcePageProps) {
@@ -46,6 +49,7 @@ export function ResourcePage(p: ResourcePageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [editing, setEditing] = useState<null | { mode: "create" | "edit"; row: Record<string, unknown> }>(null);
+  const [selected, setSelected] = useState<number[]>([]);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -53,7 +57,7 @@ export function ResourcePage(p: ResourcePageProps) {
       const res = await apiGet<ListResult<Record<string, unknown>>>(p.endpoint, {
         page, limit, q, ...filters,
       });
-      setItems(res.items); setTotal(res.total);
+      setItems(res.items); setTotal(res.total); setSelected([]);
     } catch (e) { setError((e as Error).message); }
     finally { setLoading(false); }
   };
@@ -61,6 +65,9 @@ export function ResourcePage(p: ResourcePageProps) {
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [page, JSON.stringify(filters)]);
 
   const submitSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); void load(); };
+  const toggleSelected = (id: number) => setSelected((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]);
+  const allPageSelected = items.length > 0 && items.every((row) => selected.includes(row.id as number));
+  const toggleAll = () => setSelected(allPageSelected ? [] : items.map((row) => row.id as number));
 
   const startCreate = () => {
     const blank: Record<string, unknown> = {};
@@ -152,23 +159,35 @@ export function ResourcePage(p: ResourcePageProps) {
               {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           ))}
+          {p.bulkActions && selected.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1 ring-1 ring-slate-200">
+              <span className="px-1 text-[11px] font-bold text-slate-500">{selected.length} selected</span>
+              {p.bulkActions.map((a) => (
+                <button key={a.label} onClick={() => void a.run(selected, load)} className={a.className || "rounded-md bg-slate-900 px-2.5 py-1.5 text-[11px] font-bold text-white"}>
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500">
+                <th className="px-3 py-2"><input type="checkbox" checked={allPageSelected} onChange={toggleAll} aria-label="Select all rows" /></th>
                 <th className="px-3 py-2">ID</th>
                 {p.columns.map((c) => <th key={c.key} className="px-3 py-2">{c.label}</th>)}
                 <th className="px-3 py-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={p.columns.length + 2} className="px-3 py-6 text-center text-slate-400">Loading…</td></tr>}
-              {!loading && error && <tr><td colSpan={p.columns.length + 2} className="px-3 py-6 text-center text-rose-500">{error}</td></tr>}
-              {!loading && !error && items.length === 0 && <tr><td colSpan={p.columns.length + 2} className="px-3 py-8 text-center text-slate-400">No records</td></tr>}
+              {loading && <tr><td colSpan={p.columns.length + 3} className="px-3 py-6 text-center text-slate-400">Loading…</td></tr>}
+              {!loading && error && <tr><td colSpan={p.columns.length + 3} className="px-3 py-6 text-center text-rose-500">{error}</td></tr>}
+              {!loading && !error && items.length === 0 && <tr><td colSpan={p.columns.length + 3} className="px-3 py-8 text-center text-slate-400">No records</td></tr>}
               {!loading && items.map((row) => (
                 <tr key={row.id as number} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="px-3 py-2"><input type="checkbox" checked={selected.includes(row.id as number)} onChange={() => toggleSelected(row.id as number)} aria-label={`Select row ${row.id}`} /></td>
                   <td className="px-3 py-2 font-mono text-xs text-slate-500">{row.id as number}</td>
                   {p.columns.map((c) => (
                     <td key={c.key} className="px-3 py-2">
@@ -177,6 +196,7 @@ export function ResourcePage(p: ResourcePageProps) {
                   ))}
                   <td className="px-3 py-2 text-right">
                     <div className="flex justify-end gap-1">
+                      {p.renderRowActions?.(row, load)}
                       <button onClick={() => setEditing({ mode: "edit", row })} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-shell-red"><Pencil size={14} /></button>
                       <button onClick={() => void remove(row.id as number)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-rose-600"><Trash2 size={14} /></button>
                     </div>
@@ -216,7 +236,11 @@ export function ResourcePage(p: ResourcePageProps) {
                       className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                     >
                       <option value="">—</option>
-                      {f.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+                      {f.options?.map((o) => {
+                        const value = typeof o === "object" ? o.value : o;
+                        const label = typeof o === "object" ? o.label : o;
+                        return <option key={String(value)} value={value}>{label}</option>;
+                      })}
                     </select>
                   ) : f.type === "textarea" ? (
                     <textarea

@@ -221,19 +221,34 @@ router.get('/recharges', userAuth, async (req, res) => {
 });
 
 router.get('/team', userAuth, async (req, res) => {
-  // Direct (L1) + indirect (L2) referrals
-  const [l1] = await pool.query('SELECT id, phone, name, total_recharge, created_at FROM users WHERE referrer_id = ?', [req.uid]);
+  const select = 'SELECT id, phone, name, total_recharge, status, created_at, referrer_id FROM users';
+  const [l1] = await pool.query(`${select} WHERE referrer_id = ? ORDER BY id DESC`, [req.uid]);
   const l1ids = l1.map(u => u.id);
   let l2 = [];
+  let l3 = [];
   if (l1ids.length) {
-    const [r2] = await pool.query(`SELECT id, phone, name, total_recharge, created_at, referrer_id FROM users WHERE referrer_id IN (${l1ids.map(() => '?').join(',')})`, l1ids);
+    const [r2] = await pool.query(`${select} WHERE referrer_id IN (${l1ids.map(() => '?').join(',')}) ORDER BY id DESC`, l1ids);
     l2 = r2;
+    const l2ids = l2.map(u => u.id);
+    if (l2ids.length) {
+      const [r3] = await pool.query(`${select} WHERE referrer_id IN (${l2ids.map(() => '?').join(',')}) ORDER BY id DESC`, l2ids);
+      l3 = r3;
+    }
   }
   const sum = arr => arr.reduce((s, u) => s + Number(u.total_recharge || 0), 0);
+  const withLevel = (arr, level) => arr.map(u => ({ ...u, level }));
+  const stats = [
+    { level: 1, count: l1.length, recharge: sum(l1), commission: 0 },
+    { level: 2, count: l2.length, recharge: sum(l2), commission: 0 },
+    { level: 3, count: l3.length, recharge: sum(l3), commission: 0 },
+  ];
   res.json({
     ok: true,
+    stats,
+    members: [...withLevel(l1, 1), ...withLevel(l2, 2), ...withLevel(l3, 3)],
     l1: { count: l1.length, recharge: sum(l1), users: l1 },
     l2: { count: l2.length, recharge: sum(l2), users: l2 },
+    l3: { count: l3.length, recharge: sum(l3), users: l3 },
   });
 });
 

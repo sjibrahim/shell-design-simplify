@@ -21,7 +21,8 @@ recharges.get('/', async (req, res) => {
   const W = where.length ? `WHERE ${where.join(' AND ')}` : '';
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) total FROM recharges r ${W}`, params);
   const [items] = await pool.query(
-    `SELECT r.*, u.phone AS user_phone, u.name AS user_name
+    `SELECT r.*, r.gateway AS method, r.ref_no AS reference,
+            u.phone AS user_phone, u.phone AS user_email, u.name AS user_name
        FROM recharges r LEFT JOIN users u ON u.id = r.user_id
        ${W} ORDER BY r.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
@@ -30,32 +31,43 @@ recharges.get('/', async (req, res) => {
 });
 
 recharges.post('/', async (req, res) => {
-  const { user_id, amount, gateway, ref_no, status, note } = req.body || {};
+  const { user_id, amount, gateway, method, ref_no, reference, status, note } = req.body || {};
   if (!user_id || !amount) return res.status(400).json({ error: 'user_id and amount required' });
-  const [r] = await pool.query(
-    'INSERT INTO recharges (user_id, amount, gateway, ref_no, status, note) VALUES (?,?,?,?,?,?)',
-    [user_id, amount, gateway || 'Manual', ref_no || null, status || 'pending', note || null]
-  );
-  res.json({ ok: true, id: r.insertId });
+  const amt = Number(amount);
+  const st = status || 'pending';
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [r] = await conn.query(
+      'INSERT INTO recharges (user_id, amount, gateway, ref_no, status, note) VALUES (?,?,?,?,?,?)',
+      [user_id, amt, gateway || method || 'Manual', ref_no || reference || null, st, note || null]
+    );
+    await conn.query(
+      'INSERT INTO transactions (user_id, type, amount, status, note) VALUES (?,?,?,?,?)',
+      [user_id, 'recharge', amt, st === 'success' ? 'success' : st, `Recharge #${r.insertId}`]
+    );
+    if (st === 'success') {
+      await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id = ?', [amt, amt, user_id]);
+    }
+    await conn.commit();
+    res.json({ ok: true, id: r.insertId });
+  } catch (e) { await conn.rollback(); res.status(500).json({ error: e.message }); }
+  finally { conn.release(); }
 });
 
 recharges.put('/:id', async (req, res) => {
   const id = req.params.id;
-  const [[cur]] = await pool.query('SELECT * FROM recharges WHERE id = ? FOR UPDATE', [id]).then(r => [r[0] ? r : [null]]).catch(() => [[null]]);
-  // Re-query simply (without FOR UPDATE complication)
-  const [rows] = await pool.query('SELECT * FROM recharges WHERE id = ?', [id]);
-  const row = rows[0];
-  if (!row) return res.status(404).json({ error: 'Not found' });
-
-  const newStatus = req.body.status || row.status;
-  const newAmount = req.body.amount !== undefined ? Number(req.body.amount) : Number(row.amount);
-  const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
-  const newGateway = req.body.gateway !== undefined ? req.body.gateway : row.gateway;
-  const newNote = req.body.note !== undefined ? req.body.note : row.note;
-
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    const [rows] = await conn.query('SELECT * FROM recharges WHERE id = ? FOR UPDATE', [id]);
+    const row = rows[0];
+    if (!row) { await conn.rollback(); return res.status(404).json({ error: 'Not found' }); }
+    const newStatus = req.body.status || row.status;
+    const newAmount = req.body.amount !== undefined ? Number(req.body.amount) : Number(row.amount);
+    const newRef = req.body.ref_no !== undefined ? req.body.ref_no : (req.body.reference !== undefined ? req.body.reference : row.ref_no);
+    const newGateway = req.body.gateway !== undefined ? req.body.gateway : (req.body.method !== undefined ? req.body.method : row.gateway);
+    const newNote = req.body.note !== undefined ? req.body.note : row.note;
     await conn.query(
       'UPDATE recharges SET status=?, amount=?, ref_no=?, gateway=?, note=? WHERE id=?',
       [newStatus, newAmount, newRef, newGateway, newNote, id]
@@ -109,7 +121,8 @@ withdrawals.get('/', async (req, res) => {
   const W = where.length ? `WHERE ${where.join(' AND ')}` : '';
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) total FROM withdrawals w ${W}`, params);
   const [items] = await pool.query(
-    `SELECT w.*, u.phone AS user_phone, u.name AS user_name
+    `SELECT w.*, w.channel AS method, CONCAT(w.channel, ' · ', w.account_no) AS account,
+            u.phone AS user_phone, u.phone AS user_email, u.name AS user_name
        FROM withdrawals w LEFT JOIN users u ON u.id = w.user_id
        ${W} ORDER BY w.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
@@ -118,37 +131,36 @@ withdrawals.get('/', async (req, res) => {
 });
 
 withdrawals.post('/', async (req, res) => {
-  const { user_id, amount, channel, account_no, account_name, status, ref_no, note } = req.body || {};
+  const { user_id, amount, channel, method, account_no, account, account_name, status, ref_no, note } = req.body || {};
   if (!user_id || !amount) return res.status(400).json({ error: 'user_id and amount required' });
   const fee = +(Number(amount) * 0.05).toFixed(2);
   const net = +(Number(amount) - fee).toFixed(2);
+  const safeStatus = status === 'paid' ? 'success' : (status || 'pending');
   const [r] = await pool.query(
     'INSERT INTO withdrawals (user_id, amount, fee, net_amount, channel, account_no, account_name, status, ref_no, note) VALUES (?,?,?,?,?,?,?,?,?,?)',
-    [user_id, amount, fee, net, channel || 'GCash', account_no || '', account_name || null, status || 'pending', ref_no || null, note || null]
+    [user_id, amount, fee, net, channel || method || 'GCash', account_no || account || '', account_name || null, safeStatus, ref_no || null, note || null]
   );
   res.json({ ok: true, id: r.insertId });
 });
 
 withdrawals.put('/:id', async (req, res) => {
   const id = req.params.id;
-  const [rows] = await pool.query('SELECT * FROM withdrawals WHERE id = ?', [id]);
-  const row = rows[0];
-  if (!row) return res.status(404).json({ error: 'Not found' });
-
-  const newStatus = req.body.status || row.status;
-  const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
-  const newNote = req.body.note !== undefined ? req.body.note : row.note;
-
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    const [rows] = await conn.query('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
+    const row = rows[0];
+    if (!row) { await conn.rollback(); return res.status(404).json({ error: 'Not found' }); }
+    const newStatus = req.body.status === 'paid' ? 'success' : (req.body.status || row.status);
+    const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
+    const newNote = req.body.note !== undefined ? req.body.note : row.note;
     await conn.query(
       'UPDATE withdrawals SET status=?, ref_no=?, note=? WHERE id=?',
       [newStatus, newRef, newNote, id]
     );
     const wasOpen = ['pending', 'processing'].includes(row.status);
     // Mark paid out -> transaction success (balance already deducted at request time)
-    if (wasOpen && newStatus === 'success') {
+    if (wasOpen && ['success', 'paid'].includes(newStatus)) {
       await conn.query(
         `UPDATE transactions SET status='success' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`,
         [row.user_id, `Withdraw #${id}`]
@@ -174,6 +186,62 @@ withdrawals.put('/:id', async (req, res) => {
 withdrawals.delete('/:id', async (req, res) => {
   await pool.query('DELETE FROM withdrawals WHERE id = ?', [req.params.id]);
   res.json({ ok: true });
+});
+
+recharges.post('/bulk/status', async (req, res) => {
+  const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Boolean) : [];
+  const status = req.body?.status === 'paid' ? 'success' : req.body?.status;
+  if (!ids.length || !['success', 'failed', 'pending', 'processing'].includes(status)) return res.status(400).json({ error: 'Valid ids and status required' });
+  let updated = 0;
+  for (const id of ids) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [rows] = await conn.query('SELECT * FROM recharges WHERE id = ? FOR UPDATE', [id]);
+      const row = rows[0];
+      if (!row) { await conn.rollback(); continue; }
+      await conn.query('UPDATE recharges SET status=? WHERE id=?', [status, id]);
+      const wasOpen = ['pending', 'processing'].includes(row.status);
+      if (wasOpen && status === 'success') {
+        await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id=?', [row.amount, row.amount, row.user_id]);
+        await conn.query(`UPDATE transactions SET status='success' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
+      }
+      if (wasOpen && status === 'failed') {
+        await conn.query(`UPDATE transactions SET status='failed' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
+      }
+      await conn.commit(); updated += 1;
+    } catch (e) { await conn.rollback(); }
+    finally { conn.release(); }
+  }
+  res.json({ ok: true, updated });
+});
+
+withdrawals.post('/bulk/status', async (req, res) => {
+  const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Boolean) : [];
+  const status = req.body?.status;
+  if (!ids.length || !['success', 'paid', 'failed', 'pending', 'processing'].includes(status)) return res.status(400).json({ error: 'Valid ids and status required' });
+  let updated = 0;
+  for (const id of ids) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [rows] = await conn.query('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
+      const row = rows[0];
+      if (!row) { await conn.rollback(); continue; }
+      await conn.query('UPDATE withdrawals SET status=? WHERE id=?', [status, id]);
+      const wasOpen = ['pending', 'processing'].includes(row.status);
+      if (wasOpen && ['success', 'paid'].includes(status)) {
+        await conn.query(`UPDATE transactions SET status='success' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`, [row.user_id, `Withdraw #${id}`]);
+      }
+      if (wasOpen && status === 'failed') {
+        await conn.query('UPDATE users SET balance = balance + ?, total_withdraw = GREATEST(total_withdraw - ?, 0) WHERE id=?', [row.amount, row.amount, row.user_id]);
+        await conn.query(`UPDATE transactions SET status='failed' WHERE user_id=? AND type='withdraw' AND note=? LIMIT 1`, [row.user_id, `Withdraw #${id}`]);
+      }
+      await conn.commit(); updated += 1;
+    } catch (e) { await conn.rollback(); }
+    finally { conn.release(); }
+  }
+  res.json({ ok: true, updated });
 });
 
 module.exports = { recharges, withdrawals };

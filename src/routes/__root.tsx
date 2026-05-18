@@ -12,6 +12,7 @@ import appCss from "../styles.css?url";
 import { ActivityPopup } from "@/components/ActivityPopup";
 import { AuthProvider } from "@/lib/auth";
 import { AuthGate } from "@/components/RequireAuth";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -121,6 +122,7 @@ function RootComponent() {
           <Outlet />
         </AuthGate>
         <ActivityPopup />
+        <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>
   );

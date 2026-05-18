@@ -16,6 +16,7 @@ import shellHero from "@/assets/shell-hero.jpg";
 import shellPlan from "@/assets/shell-plan.jpg";
 import { useAuth } from "@/lib/auth";
 import { fmtPeso, uGet, uPost } from "@/lib/user-api";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,6 +52,7 @@ function HomePage() {
   const [plans, setPlans] = useState<ApiPlan[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [buying, setBuying] = useState<number | null>(null);
+  const [confirmPlan, setConfirmPlan] = useState<ApiPlan | null>(null);
 
   useEffect(() => {
     uGet<{ ok: true; items: ApiPlan[] }>("/api/u/plans")
@@ -61,13 +63,13 @@ function HomePage() {
 
   const buy = async (p: ApiPlan) => {
     if (!user) { navigate({ to: "/login" }); return; }
-    if (!confirm(`Purchase ${p.name} for ${fmtPeso(p.price)}?`)) return;
     setBuying(p.id);
     try {
       await uPost("/api/u/buy-plan", { plan_id: p.id });
       await refresh();
-      alert("Purchase successful!");
-    } catch (e) { alert((e as Error).message); }
+      setConfirmPlan(null);
+      toast.success("Plan purchased successfully", { description: `${p.name} is now active.` });
+    } catch (e) { toast.error("Purchase failed", { description: (e as Error).message }); }
     finally { setBuying(null); }
   };
 
@@ -205,7 +207,7 @@ function HomePage() {
                   <div className="px-4 pb-4">
                     <button
                       disabled={buying === p.id}
-                      onClick={() => buy(p)}
+                      onClick={() => user ? setConfirmPlan(p) : navigate({ to: "/login" })}
                       className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-3.5 text-base font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-60"
                     >
                       <ShoppingCart size={18} />
@@ -218,6 +220,35 @@ function HomePage() {
           )}
         </section>
       </main>
+      {confirmPlan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4" onClick={() => setConfirmPlan(null)}>
+          <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-shell-red/10 text-shell-red">
+                <ShoppingCart size={22} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-extrabold text-foreground">Confirm Purchase</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Buy {confirmPlan.name} for {fmtPeso(confirmPlan.price)}?</p>
+              </div>
+            </div>
+            <div className="mt-4 rounded-2xl bg-muted/50 p-3 text-sm">
+              <div className="flex justify-between"><span>Wallet balance</span><b>{fmtPeso(user?.balance ?? 0)}</b></div>
+              <div className="mt-1 flex justify-between"><span>Daily income</span><b className="text-shell-green">{fmtPeso(confirmPlan.daily_income)}</b></div>
+              <div className="mt-1 flex justify-between"><span>Total return</span><b className="text-shell-red">{fmtPeso(confirmPlan.total_income)}</b></div>
+            </div>
+            {Number(user?.balance ?? 0) < Number(confirmPlan.price) && (
+              <div className="mt-3 rounded-xl bg-shell-red/10 px-3 py-2 text-xs font-bold text-shell-red">Insufficient balance. Please recharge first.</div>
+            )}
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <button onClick={() => setConfirmPlan(null)} className="rounded-2xl border border-border py-3 text-sm font-bold text-foreground">Cancel</button>
+              <button disabled={buying === confirmPlan.id || Number(user?.balance ?? 0) < Number(confirmPlan.price)} onClick={() => void buy(confirmPlan)} className="rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark py-3 text-sm font-bold text-white disabled:opacity-50">
+                {buying === confirmPlan.id ? "Purchasing…" : "Purchase"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageShell>
   );
 }
