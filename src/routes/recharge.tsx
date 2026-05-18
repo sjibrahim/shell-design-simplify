@@ -17,8 +17,10 @@ export const Route = createFileRoute("/recharge")({
 });
 
 const METHODS = [
-  { id: "GCash",   name: "GCash",   color: "bg-sky-500" },
-  { id: "PayMaya", name: "PayMaya", color: "bg-emerald-500" },
+  { id: "WatchPay", name: "WatchPay", color: "bg-shell-red" },
+  { id: "HeyPay",   name: "HeyPay",   color: "bg-indigo-500" },
+  { id: "GCash",    name: "GCash",    color: "bg-sky-500" },
+  { id: "PayMaya",  name: "PayMaya",  color: "bg-emerald-500" },
 ] as const;
 
 const PRESETS = [500, 1000, 2500, 5000, 10000, 20000];
