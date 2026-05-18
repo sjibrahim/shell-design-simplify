@@ -16,7 +16,7 @@ export const Route = createFileRoute("/team")({
   component: TeamPage,
 });
 
-interface TeamStats { level: 1 | 2 | 3; count: number; commission?: number | string; recharge?: number | string }
+interface TeamStats { level: 1 | 2 | 3; count: number; commission?: number | string; recharge?: number | string; rate?: number }
 
 
 function TeamPage() {
@@ -37,15 +37,16 @@ function TeamPage() {
   }, [user]);
 
   const styleByLevel = [
-    { dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5",   rate: "15%", sub: "Direct invites" },
-    { dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5", rate: "8%",  sub: "Sub-team" },
-    { dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5", rate: "3%",  sub: "Extended" },
+    { dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5",   sub: "Direct invites" },
+    { dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5", sub: "Sub-team" },
+    { dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5", sub: "Extended" },
   ];
   const levels = [1, 2, 3].map((n) => {
     const s = stats.find((x) => Number(x.level) === n);
     const st = styleByLevel[n - 1];
     return {
-      n, label: `Level ${n}`, sub: st.sub, rate: st.rate,
+      n, label: `Level ${n}`, sub: st.sub,
+      rate: `${Number(s?.rate ?? 0)}%`,
       rebate: fmtPeso(s?.commission ?? 0),
       qty: s?.count ?? 0,
       dot: st.dot, ring: st.ring, tint: st.tint,

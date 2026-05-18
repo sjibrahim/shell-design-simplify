@@ -5,6 +5,7 @@ const express = require('express');
 const pool = require('../db');
 const { authRequired } = require('../middleware/auth');
 const { paginate } = require('../middleware/helpers');
+const { creditUplineCommissions } = require('../lib/commission');
 
 // --- Recharges ---
 const recharges = express.Router();
@@ -48,6 +49,7 @@ recharges.post('/', async (req, res) => {
     );
     if (st === 'success') {
       await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id = ?', [amt, amt, user_id]);
+      await creditUplineCommissions(conn, { userId: user_id, amount: amt, rechargeId: r.insertId });
     }
     await conn.commit();
     res.json({ ok: true, id: r.insertId });
@@ -84,6 +86,7 @@ recharges.put('/:id', async (req, res) => {
            WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`,
         [newAmount, row.user_id, `Recharge #${id}`]
       );
+      await creditUplineCommissions(conn, { userId: row.user_id, amount: newAmount, rechargeId: Number(id) });
     }
     // Open -> failed: mark transaction failed (no wallet change)
     if (wasOpen && newStatus === 'failed') {
@@ -205,6 +208,7 @@ recharges.post('/bulk/status', async (req, res) => {
       if (wasOpen && status === 'success') {
         await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id=?', [row.amount, row.amount, row.user_id]);
         await conn.query(`UPDATE transactions SET status='success' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
+        await creditUplineCommissions(conn, { userId: row.user_id, amount: Number(row.amount), rechargeId: Number(id) });
       }
       if (wasOpen && status === 'failed') {
         await conn.query(`UPDATE transactions SET status='failed' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);

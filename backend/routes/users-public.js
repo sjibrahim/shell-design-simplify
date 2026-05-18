@@ -128,15 +128,33 @@ router.post('/recharge', userAuth, async (req, res) => {
   const { amount, gateway } = req.body || {};
   const amt = Number(amount);
   if (!Number.isFinite(amt) || amt <= 0) return res.status(400).json({ error: 'Invalid amount' });
+  const gw = gateway || 'WatchPay';
   const [ins] = await pool.query(
     'INSERT INTO recharges (user_id, amount, gateway, status) VALUES (?,?,?,?)',
-    [req.uid, amt, gateway || 'WatchPay', 'pending']
+    [req.uid, amt, gw, 'pending']
   );
   await pool.query(
     'INSERT INTO transactions (user_id, type, amount, status, note) VALUES (?,?,?,?,?)',
     [req.uid, 'recharge', amt, 'pending', `Recharge #${ins.insertId}`]
   );
-  res.json({ ok: true, id: ins.insertId });
+
+  // Try to initialise online checkout for supported gateways
+  let pay_url = null;
+  if (gw === 'WatchPay' || gw === 'HeyPay') {
+    try {
+      const { createPayment } = require('../lib/payment-gateways');
+      const host = `${req.protocol}://${req.get('host')}`;
+      const notifyPath = gw === 'WatchPay' ? '/api/public/watchpay/callback' : '/api/public/heypay/callback';
+      const result = await createPayment(gw, {
+        orderId: ins.insertId,
+        amount: amt,
+        notifyUrl: host + notifyPath,
+        returnUrl: req.body.return_url || '',
+      });
+      if (result.ok && result.pay_url) pay_url = result.pay_url;
+    } catch (e) { /* fall through to manual */ }
+  }
+  res.json({ ok: true, id: ins.insertId, pay_url });
 });
 
 router.post('/withdraw', userAuth, async (req, res) => {
@@ -242,19 +260,49 @@ router.get('/team', userAuth, async (req, res) => {
   }
   const sum = arr => arr.reduce((s, u) => s + Number(u.total_recharge || 0), 0);
   const withLevel = (arr, level) => arr.map(u => ({ ...u, level }));
+
+  // Real commission totals from commissions table
+  const [cRows] = await pool.query(
+    "SELECT level, COALESCE(SUM(amount),0) AS total FROM commissions WHERE user_id = ? GROUP BY level",
+    [req.uid]
+  );
+  const commByLevel = { 1: 0, 2: 0, 3: 0 };
+  cRows.forEach(r => { commByLevel[r.level] = Number(r.total); });
+
+  // Commission rates from settings
+  const [sRows] = await pool.query(
+    "SELECT k, v FROM settings WHERE k IN ('commission_l1','commission_l2','commission_l3')"
+  );
+  const sMap = Object.fromEntries(sRows.map(r => [r.k, Number(r.v)]));
+  const rates = {
+    1: Number(sMap.commission_l1 || 0),
+    2: Number(sMap.commission_l2 || 0),
+    3: Number(sMap.commission_l3 || 0),
+  };
+
   const stats = [
-    { level: 1, count: l1.length, recharge: sum(l1), commission: 0 },
-    { level: 2, count: l2.length, recharge: sum(l2), commission: 0 },
-    { level: 3, count: l3.length, recharge: sum(l3), commission: 0 },
+    { level: 1, count: l1.length, recharge: sum(l1), commission: commByLevel[1], rate: rates[1] },
+    { level: 2, count: l2.length, recharge: sum(l2), commission: commByLevel[2], rate: rates[2] },
+    { level: 3, count: l3.length, recharge: sum(l3), commission: commByLevel[3], rate: rates[3] },
   ];
   res.json({
     ok: true,
     stats,
     members: [...withLevel(l1, 1), ...withLevel(l2, 2), ...withLevel(l3, 3)],
-    l1: { count: l1.length, recharge: sum(l1), users: l1 },
-    l2: { count: l2.length, recharge: sum(l2), users: l2 },
-    l3: { count: l3.length, recharge: sum(l3), users: l3 },
+    l1: { count: l1.length, recharge: sum(l1), commission: commByLevel[1], users: l1 },
+    l2: { count: l2.length, recharge: sum(l2), commission: commByLevel[2], users: l2 },
+    l3: { count: l3.length, recharge: sum(l3), commission: commByLevel[3], users: l3 },
+    total_commission: commByLevel[1] + commByLevel[2] + commByLevel[3],
   });
+});
+
+router.get('/commissions', userAuth, async (req, res) => {
+  const [rows] = await pool.query(
+    `SELECT c.id, c.level, c.amount, c.base_amount, c.rate, c.created_at,
+            u.phone AS source_phone, u.name AS source_name
+       FROM commissions c LEFT JOIN users u ON u.id = c.source_user_id
+       WHERE c.user_id = ? ORDER BY c.id DESC LIMIT 200`, [req.uid]);
+  res.json({ ok: true, items: rows });
 });
 
 // ===== Redeem code =====

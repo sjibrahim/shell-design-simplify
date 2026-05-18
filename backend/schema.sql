@@ -167,3 +167,28 @@ CREATE TABLE IF NOT EXISTS redeem_claims (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uniq_user_code (user_id, code_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS commissions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,            -- upline receiver
+  source_user_id INT NOT NULL,     -- downline who recharged
+  level TINYINT NOT NULL,          -- 1, 2 or 3
+  recharge_id INT DEFAULT NULL,
+  base_amount DECIMAL(12,2) NOT NULL,
+  rate DECIMAL(6,3) NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_cm_user_level (user_id, level),
+  INDEX idx_cm_source (source_user_id),
+  UNIQUE KEY uniq_recharge_level (recharge_id, level, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS sliders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(190) DEFAULT NULL,
+  image_url VARCHAR(500) NOT NULL,
+  link_url VARCHAR(500) DEFAULT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

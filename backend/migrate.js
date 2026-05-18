@@ -39,6 +39,8 @@ const DEFAULT_SETTINGS = [
     };
     await safeAlter("ALTER TABLE plans ADD COLUMN type ENUM('normal','vip') NOT NULL DEFAULT 'normal' AFTER name");
     await safeAlter("ALTER TABLE plans ADD INDEX idx_plans_type (type)");
+    await safeAlter("CREATE TABLE IF NOT EXISTS commissions (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, source_user_id INT NOT NULL, level TINYINT NOT NULL, recharge_id INT DEFAULT NULL, base_amount DECIMAL(12,2) NOT NULL, rate DECIMAL(6,3) NOT NULL, amount DECIMAL(12,2) NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_cm_user_level (user_id, level), INDEX idx_cm_source (source_user_id), UNIQUE KEY uniq_recharge_level (recharge_id, level, user_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    await safeAlter("CREATE TABLE IF NOT EXISTS sliders (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(190) DEFAULT NULL, image_url VARCHAR(500) NOT NULL, link_url VARCHAR(500) DEFAULT NULL, sort_order INT NOT NULL DEFAULT 0, active TINYINT(1) NOT NULL DEFAULT 1, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     console.log('✓ ALTERs applied');
 
     // seed default admin
@@ -65,15 +67,19 @@ const DEFAULT_SETTINGS = [
     }
     console.log('✓ Default settings seeded');
 
-    // seed one demo gateway
-    const [gw] = await conn.query('SELECT id FROM gateways LIMIT 1');
-    if (gw.length === 0) {
-      await conn.query(
-        'INSERT INTO gateways (type, name, title, min_amount, merchant_id, api_key) VALUES (?,?,?,?,?,?)',
-        ['recharge', 'WatchPay', 'WatchPay', 120, '100225575', 'a524cd5e34324415a338513e57c06631']
-      );
-      console.log('✓ Demo gateway inserted');
-    }
+    // seed demo gateways (WatchPay + HeyPay) — merchant_id/api_key are placeholders
+    const ensureGw = async (name) => {
+      const [r] = await conn.query('SELECT id FROM gateways WHERE name = ? LIMIT 1', [name]);
+      if (!r.length) {
+        await conn.query(
+          'INSERT INTO gateways (type, name, title, min_amount, max_amount, merchant_id, api_key) VALUES (?,?,?,?,?,?,?)',
+          ['recharge', name, name, 120, 50000, 'REPLACE_MERCHANT_ID', 'REPLACE_API_KEY']
+        );
+        console.log(`✓ Seeded gateway ${name}`);
+      }
+    };
+    await ensureGw('WatchPay');
+    await ensureGw('HeyPay');
 
     console.log('\n✅ Migration complete.');
     process.exit(0);

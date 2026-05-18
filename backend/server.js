@@ -13,6 +13,7 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Health
 app.get('/', (_req, res) => res.json({ ok: true, name: 'shell-admin-api', version: '1.0.0' }));
@@ -28,6 +29,8 @@ app.use('/api/users',        require('./routes/users'));
 app.use('/api/settings',     require('./routes/settings'));
 // User-side public API (mobile app uses these)
 app.use('/api/u',            require('./routes/users-public'));
+// Public webhook callbacks (no auth — verified by signature inside)
+app.use('/api/public',       require('./routes/public-callbacks'));
 
 const crud = require('./routes/_crud');
 

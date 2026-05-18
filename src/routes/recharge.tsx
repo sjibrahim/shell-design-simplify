@@ -17,8 +17,10 @@ export const Route = createFileRoute("/recharge")({
 });
 
 const METHODS = [
-  { id: "GCash",   name: "GCash",   color: "bg-sky-500" },
-  { id: "PayMaya", name: "PayMaya", color: "bg-emerald-500" },
+  { id: "WatchPay", name: "WatchPay", color: "bg-shell-red" },
+  { id: "HeyPay",   name: "HeyPay",   color: "bg-indigo-500" },
+  { id: "GCash",    name: "GCash",    color: "bg-sky-500" },
+  { id: "PayMaya",  name: "PayMaya",  color: "bg-emerald-500" },
 ] as const;
 
 const PRESETS = [500, 1000, 2500, 5000, 10000, 20000];
@@ -26,7 +28,7 @@ const PRESETS = [500, 1000, 2500, 5000, 10000, 20000];
 function RechargePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [method, setMethod] = useState<typeof METHODS[number]["id"]>("GCash");
+  const [method, setMethod] = useState<typeof METHODS[number]["id"]>("WatchPay");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +38,12 @@ function RechargePage() {
     if (!amt || amt < 100) { toast.error("Minimum recharge is ₱100"); return; }
     setLoading(true);
     try {
-      await uPost("/api/u/recharge", { amount: amt, gateway: method });
+      const r = await uPost<{ ok: true; id: number; pay_url?: string | null }>("/api/u/recharge", { amount: amt, gateway: method });
+      if (r.pay_url) {
+        toast.success("Redirecting to payment…");
+        window.location.href = r.pay_url;
+        return;
+      }
       toast.success("Recharge request submitted", { description: "Awaiting admin confirmation." });
       navigate({ to: "/transactions" });
     } catch (e) { toast.error((e as Error).message); }
