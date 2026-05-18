@@ -67,15 +67,19 @@ const DEFAULT_SETTINGS = [
     }
     console.log('✓ Default settings seeded');
 
-    // seed one demo gateway
-    const [gw] = await conn.query('SELECT id FROM gateways LIMIT 1');
-    if (gw.length === 0) {
-      await conn.query(
-        'INSERT INTO gateways (type, name, title, min_amount, merchant_id, api_key) VALUES (?,?,?,?,?,?)',
-        ['recharge', 'WatchPay', 'WatchPay', 120, '100225575', 'a524cd5e34324415a338513e57c06631']
-      );
-      console.log('✓ Demo gateway inserted');
-    }
+    // seed demo gateways (WatchPay + HeyPay) — merchant_id/api_key are placeholders
+    const ensureGw = async (name) => {
+      const [r] = await conn.query('SELECT id FROM gateways WHERE name = ? LIMIT 1', [name]);
+      if (!r.length) {
+        await conn.query(
+          'INSERT INTO gateways (type, name, title, min_amount, max_amount, merchant_id, api_key) VALUES (?,?,?,?,?,?,?)',
+          ['recharge', name, name, 120, 50000, 'REPLACE_MERCHANT_ID', 'REPLACE_API_KEY']
+        );
+        console.log(`✓ Seeded gateway ${name}`);
+      }
+    };
+    await ensureGw('WatchPay');
+    await ensureGw('HeyPay');
 
     console.log('\n✅ Migration complete.');
     process.exit(0);
