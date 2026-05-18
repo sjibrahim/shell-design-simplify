@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Copy, Check, Gift, Users, Wallet, Share2, TrendingUp, UserPlus, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { Copy, Check, Gift, Users, Wallet, Share2, TrendingUp, UserPlus, ShieldCheck, ArrowUpRight, Crown } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import shellLogo from "@/assets/shell-logo.png";
 
