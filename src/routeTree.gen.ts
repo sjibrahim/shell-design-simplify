@@ -9,9 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WithdrawalsRouteImport } from './routes/withdrawals'
 import { Route as WithdrawRouteImport } from './routes/withdraw'
+import { Route as VipBonusRouteImport } from './routes/vip-bonus'
 import { Route as TreasureBoxRouteImport } from './routes/treasure-box'
+import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as TestHeadersRouteImport } from './routes/test-headers'
+import { Route as TeamViewRouteImport } from './routes/team-view'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RedeemRouteImport } from './routes/redeem'
@@ -23,12 +27,23 @@ import { Route as InviteRouteImport } from './routes/invite'
 import { Route as IncomeDetailsRouteImport } from './routes/income-details'
 import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as AppDownloadRouteImport } from './routes/app-download'
+import { Route as AddBankRouteImport } from './routes/add-bank'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WithdrawalsRoute = WithdrawalsRouteImport.update({
+  id: '/withdrawals',
+  path: '/withdrawals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WithdrawRoute = WithdrawRouteImport.update({
   id: '/withdraw',
   path: '/withdraw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VipBonusRoute = VipBonusRouteImport.update({
+  id: '/vip-bonus',
+  path: '/vip-bonus',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TreasureBoxRoute = TreasureBoxRouteImport.update({
@@ -36,9 +51,19 @@ const TreasureBoxRoute = TreasureBoxRouteImport.update({
   path: '/treasure-box',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TransactionsRoute = TransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestHeadersRoute = TestHeadersRouteImport.update({
   id: '/test-headers',
   path: '/test-headers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamViewRoute = TeamViewRouteImport.update({
+  id: '/team-view',
+  path: '/team-view',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeamRoute = TeamRouteImport.update({
@@ -96,6 +121,11 @@ const AppDownloadRoute = AppDownloadRouteImport.update({
   path: '/app-download',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AddBankRoute = AddBankRouteImport.update({
+  id: '/add-bank',
+  path: '/add-bank',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -110,6 +140,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/add-bank': typeof AddBankRoute
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -121,13 +152,18 @@ export interface FileRoutesByFullPath {
   '/redeem': typeof RedeemRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/team-view': typeof TeamViewRoute
   '/test-headers': typeof TestHeadersRoute
+  '/transactions': typeof TransactionsRoute
   '/treasure-box': typeof TreasureBoxRoute
+  '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
+  '/withdrawals': typeof WithdrawalsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/add-bank': typeof AddBankRoute
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -139,14 +175,19 @@ export interface FileRoutesByTo {
   '/redeem': typeof RedeemRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/team-view': typeof TeamViewRoute
   '/test-headers': typeof TestHeadersRoute
+  '/transactions': typeof TransactionsRoute
   '/treasure-box': typeof TreasureBoxRoute
+  '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
+  '/withdrawals': typeof WithdrawalsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/add-bank': typeof AddBankRoute
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -158,15 +199,20 @@ export interface FileRoutesById {
   '/redeem': typeof RedeemRoute
   '/register': typeof RegisterRoute
   '/team': typeof TeamRoute
+  '/team-view': typeof TeamViewRoute
   '/test-headers': typeof TestHeadersRoute
+  '/transactions': typeof TransactionsRoute
   '/treasure-box': typeof TreasureBoxRoute
+  '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
+  '/withdrawals': typeof WithdrawalsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/add-bank'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -178,13 +224,18 @@ export interface FileRouteTypes {
     | '/redeem'
     | '/register'
     | '/team'
+    | '/team-view'
     | '/test-headers'
+    | '/transactions'
     | '/treasure-box'
+    | '/vip-bonus'
     | '/withdraw'
+    | '/withdrawals'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/add-bank'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -196,13 +247,18 @@ export interface FileRouteTypes {
     | '/redeem'
     | '/register'
     | '/team'
+    | '/team-view'
     | '/test-headers'
+    | '/transactions'
     | '/treasure-box'
+    | '/vip-bonus'
     | '/withdraw'
+    | '/withdrawals'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/add-bank'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -214,14 +270,19 @@ export interface FileRouteTypes {
     | '/redeem'
     | '/register'
     | '/team'
+    | '/team-view'
     | '/test-headers'
+    | '/transactions'
     | '/treasure-box'
+    | '/vip-bonus'
     | '/withdraw'
+    | '/withdrawals'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AddBankRoute: typeof AddBankRoute
   AppDownloadRoute: typeof AppDownloadRoute
   ChannelRoute: typeof ChannelRoute
   IncomeDetailsRoute: typeof IncomeDetailsRoute
@@ -233,18 +294,36 @@ export interface RootRouteChildren {
   RedeemRoute: typeof RedeemRoute
   RegisterRoute: typeof RegisterRoute
   TeamRoute: typeof TeamRoute
+  TeamViewRoute: typeof TeamViewRoute
   TestHeadersRoute: typeof TestHeadersRoute
+  TransactionsRoute: typeof TransactionsRoute
   TreasureBoxRoute: typeof TreasureBoxRoute
+  VipBonusRoute: typeof VipBonusRoute
   WithdrawRoute: typeof WithdrawRoute
+  WithdrawalsRoute: typeof WithdrawalsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/withdrawals': {
+      id: '/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/withdrawals'
+      preLoaderRoute: typeof WithdrawalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/withdraw': {
       id: '/withdraw'
       path: '/withdraw'
       fullPath: '/withdraw'
       preLoaderRoute: typeof WithdrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vip-bonus': {
+      id: '/vip-bonus'
+      path: '/vip-bonus'
+      fullPath: '/vip-bonus'
+      preLoaderRoute: typeof VipBonusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/treasure-box': {
@@ -254,11 +333,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TreasureBoxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/transactions': {
+      id: '/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/test-headers': {
       id: '/test-headers'
       path: '/test-headers'
       fullPath: '/test-headers'
       preLoaderRoute: typeof TestHeadersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team-view': {
+      id: '/team-view'
+      path: '/team-view'
+      fullPath: '/team-view'
+      preLoaderRoute: typeof TeamViewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/team': {
@@ -338,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/add-bank': {
+      id: '/add-bank'
+      path: '/add-bank'
+      fullPath: '/add-bank'
+      preLoaderRoute: typeof AddBankRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -358,6 +458,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AddBankRoute: AddBankRoute,
   AppDownloadRoute: AppDownloadRoute,
   ChannelRoute: ChannelRoute,
   IncomeDetailsRoute: IncomeDetailsRoute,
@@ -369,10 +470,24 @@ const rootRouteChildren: RootRouteChildren = {
   RedeemRoute: RedeemRoute,
   RegisterRoute: RegisterRoute,
   TeamRoute: TeamRoute,
+  TeamViewRoute: TeamViewRoute,
   TestHeadersRoute: TestHeadersRoute,
+  TransactionsRoute: TransactionsRoute,
   TreasureBoxRoute: TreasureBoxRoute,
+  VipBonusRoute: VipBonusRoute,
   WithdrawRoute: WithdrawRoute,
+  WithdrawalsRoute: WithdrawalsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
