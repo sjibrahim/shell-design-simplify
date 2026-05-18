@@ -28,7 +28,7 @@ const PRESETS = [500, 1000, 2500, 5000, 10000, 20000];
 function RechargePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [method, setMethod] = useState<typeof METHODS[number]["id"]>("GCash");
+  const [method, setMethod] = useState<typeof METHODS[number]["id"]>("WatchPay");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
