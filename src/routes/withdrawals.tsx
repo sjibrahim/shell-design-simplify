@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   ArrowDownToLine,
   Landmark,
@@ -13,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { uGet, fmtPeso } from "@/lib/user-api";
 
 export const Route = createFileRoute("/withdrawals")({
   head: () => ({
@@ -24,39 +26,47 @@ export const Route = createFileRoute("/withdrawals")({
   component: WithdrawalsPage,
 });
 
-type Status = "success" | "pending" | "failed";
+type Status = "success" | "pending" | "failed" | "paid" | "rejected";
 type Record = {
-  id: string;
-  amount: number;
-  fee: number;
-  net: number;
-  bank: string;
-  bankIcon: string;
-  date: string;
+  id: number | string;
+  amount: number | string;
+  fee?: number | string;
+  net_amount?: number | string;
+  channel?: string | null;
+  account_no?: string | null;
+  account_name?: string | null;
+  created_at: string;
   status: Status;
-  ref: string;
-  eta?: string;
+  ref?: string | null;
+  note?: string | null;
 };
 
-const RECORDS: Record[] = [
-  { id: "WD8821", amount: 1500, fee: 30, net: 1470, bank: "GCash · 0912xxx7821", bankIcon: "G", date: "2026-05-17 14:33", status: "pending", ref: "TXN-2A8F91", eta: "Approx. 2h remaining" },
-  { id: "WD8810", amount: 800,  fee: 16, net: 784,  bank: "BPI · ****4421",      bankIcon: "B", date: "2026-05-15 18:42", status: "success", ref: "TXN-2A7C40" },
-  { id: "WD8802", amount: 320,  fee: 6,  net: 314,  bank: "Maya · 0945xxx3320",  bankIcon: "M", date: "2026-05-12 11:09", status: "failed",  ref: "TXN-2A6B19" },
-  { id: "WD8790", amount: 2500, fee: 50, net: 2450, bank: "BDO · ****8821",      bankIcon: "B", date: "2026-05-08 16:00", status: "success", ref: "TXN-2A5102" },
-  { id: "WD8770", amount: 500,  fee: 10, net: 490,  bank: "GCash · 0912xxx7821", bankIcon: "G", date: "2026-05-02 09:21", status: "success", ref: "TXN-2A3877" },
-];
-
-const statusMeta: { [K in Status]: { tint: string; ring: string; icon: typeof Check; label: string } } = {
+const statusMeta: globalThis.Record<string, { tint: string; ring: string; icon: typeof Check; label: string }> = {
   success: { tint: "bg-shell-green/15 text-shell-green", ring: "ring-shell-green/30", icon: Check, label: "Paid" },
-  pending: { tint: "bg-shell-yellow/30 text-[#8a6500]",   ring: "ring-shell-yellow/50", icon: Clock, label: "Processing" },
-  failed:  { tint: "bg-shell-red/10 text-shell-red",       ring: "ring-shell-red/30",    icon: X,     label: "Failed" },
+  paid:    { tint: "bg-shell-green/15 text-shell-green", ring: "ring-shell-green/30", icon: Check, label: "Paid" },
+  pending: { tint: "bg-shell-yellow/30 text-[#8a6500]",  ring: "ring-shell-yellow/50", icon: Clock, label: "Processing" },
+  failed:  { tint: "bg-shell-red/10 text-shell-red",     ring: "ring-shell-red/30",    icon: X,     label: "Failed" },
+  rejected:{ tint: "bg-shell-red/10 text-shell-red",     ring: "ring-shell-red/30",    icon: X,     label: "Rejected" },
 };
 
 function WithdrawalsPage() {
-  const totalPaid = RECORDS.filter((r) => r.status === "success").reduce((s, r) => s + r.net, 0);
-  const totalReq = RECORDS.reduce((s, r) => s + r.amount, 0);
-  const pendingCount = RECORDS.filter((r) => r.status === "pending").length;
-  const successCount = RECORDS.filter((r) => r.status === "success").length;
+  const [records, setRecords] = useState<Record[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    uGet<{ ok: true; items: Record[] }>("/api/u/withdrawals")
+      .then((r) => setRecords(r.items || []))
+      .catch(() => setRecords([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const num = (v: number | string | undefined) => Number(v ?? 0);
+  const isPaid = (s: Status) => s === "success" || s === "paid";
+  const totalPaid = records.filter((r) => isPaid(r.status)).reduce((s, r) => s + num(r.net_amount ?? r.amount), 0);
+  const totalReq = records.reduce((s, r) => s + num(r.amount), 0);
+  const pendingCount = records.filter((r) => r.status === "pending").length;
+  const successCount = records.filter((r) => isPaid(r.status)).length;
+
 
   return (
     <SubPage title="Withdrawals" icon={<ArrowDownToLine size={26} className="text-white" />} subtitle="Your payout history & status">
