@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Landmark, Shield, Check, Smartphone } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
 import { useAuth } from "@/lib/auth";
@@ -28,6 +28,14 @@ function AddBankPage() {
   const [acc, setAcc] = useState(user?.withdraw_account_no || "");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setName(user.withdraw_account_name || "");
+    setAcc(user.withdraw_account_no || "");
+    const existing = WALLETS.find((w) => w.name === user.withdraw_channel);
+    if (existing) setWallet(existing.id);
+  }, [user]);
 
   const save = async () => {
     if (!name.trim() || !acc.trim()) { toast.error("Account name and number required"); return; }
