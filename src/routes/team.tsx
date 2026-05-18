@@ -16,7 +16,7 @@ export const Route = createFileRoute("/team")({
   component: TeamPage,
 });
 
-interface TeamStats { level: 1 | 2 | 3; count: number; commission?: number | string; recharge?: number | string }
+interface TeamStats { level: 1 | 2 | 3; count: number; commission?: number | string; recharge?: number | string; rate?: number }
 
 
 function TeamPage() {
