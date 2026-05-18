@@ -16,7 +16,7 @@ function PlansPage() {
         { key: "name", label: "Name" },
         { key: "type", label: "Type", render: (r) => (
           <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${r.type === "vip" ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>
-            {r.type || "normal"}
+            {String(r.type || "normal")}
           </span>
         ) },
         { key: "price", label: "Price", render: (r) => `₱${Number(r.price ?? 0).toLocaleString()}` },

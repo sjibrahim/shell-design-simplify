@@ -14,7 +14,7 @@ function SlidersPage() {
       searchPlaceholder="Search sliders…"
       columns={[
         { key: "id", label: "ID" },
-        { key: "image_url", label: "Image", render: (r) => r.image_url ? <img src={r.image_url} alt="" className="h-10 w-16 rounded object-cover" /> : "—" },
+        { key: "image_url", label: "Image", render: (r) => r.image_url ? <img src={String(r.image_url)} alt="" className="h-10 w-16 rounded object-cover" /> : "—" },
         { key: "title", label: "Title" },
         { key: "link_url", label: "Link" },
         { key: "sort_order", label: "Order" },
