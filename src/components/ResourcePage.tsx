@@ -182,9 +182,9 @@ export function ResourcePage(p: ResourcePageProps) {
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={p.columns.length + 2} className="px-3 py-6 text-center text-slate-400">Loading…</td></tr>}
-              {!loading && error && <tr><td colSpan={p.columns.length + 2} className="px-3 py-6 text-center text-rose-500">{error}</td></tr>}
-              {!loading && !error && items.length === 0 && <tr><td colSpan={p.columns.length + 2} className="px-3 py-8 text-center text-slate-400">No records</td></tr>}
+              {loading && <tr><td colSpan={p.columns.length + 3} className="px-3 py-6 text-center text-slate-400">Loading…</td></tr>}
+              {!loading && error && <tr><td colSpan={p.columns.length + 3} className="px-3 py-6 text-center text-rose-500">{error}</td></tr>}
+              {!loading && !error && items.length === 0 && <tr><td colSpan={p.columns.length + 3} className="px-3 py-8 text-center text-slate-400">No records</td></tr>}
               {!loading && items.map((row) => (
                 <tr key={row.id as number} className="border-b border-slate-100 hover:bg-slate-50">
                   <td className="px-3 py-2"><input type="checkbox" checked={selected.includes(row.id as number)} onChange={() => toggleSelected(row.id as number)} aria-label={`Select row ${row.id}`} /></td>
