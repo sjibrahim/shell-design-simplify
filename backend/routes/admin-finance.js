@@ -86,6 +86,7 @@ recharges.put('/:id', async (req, res) => {
            WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`,
         [newAmount, row.user_id, `Recharge #${id}`]
       );
+      await creditUplineCommissions(conn, { userId: row.user_id, amount: newAmount, rechargeId: Number(id) });
     }
     // Open -> failed: mark transaction failed (no wallet change)
     if (wasOpen && newStatus === 'failed') {
