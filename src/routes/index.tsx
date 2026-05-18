@@ -161,15 +161,42 @@ function HomePage() {
             <h2 className="text-lg font-extrabold text-foreground">Investment Plans</h2>
           </div>
 
-          {loadingPlans ? (
-            <div className="rounded-2xl bg-white p-6 text-center text-sm text-muted-foreground">Loading plans…</div>
-          ) : plans.length === 0 ? (
-            <div className="rounded-2xl bg-white p-6 text-center text-sm text-muted-foreground">
-              No plans available yet. Add some in the admin panel.
-            </div>
-          ) : (
+          {/* Normal / VIP tabs */}
+          <div className="mb-3 grid grid-cols-2 gap-1.5 rounded-2xl bg-white p-1.5 ring-1 ring-black/5 shadow-sm">
+            {([
+              { key: "normal" as const, label: "Normal" },
+              { key: "vip" as const, label: "VIP" },
+            ]).map((t) => {
+              const active = planTab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setPlanTab(t.key)}
+                  className={`rounded-xl py-2.5 text-sm font-extrabold transition ${
+                    active
+                      ? t.key === "vip"
+                        ? "bg-gradient-to-r from-shell-yellow to-amber-500 text-shell-red-dark shadow"
+                        : "bg-gradient-to-r from-shell-red to-shell-red-dark text-white shadow"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {t.label} {t.key === "vip" && <span className="ml-1 text-[10px]">★</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          {(() => {
+            const filtered = plans.filter((p) => (p.type || "normal") === planTab);
+            if (loadingPlans) return <div className="rounded-2xl bg-white p-6 text-center text-sm text-muted-foreground">Loading plans…</div>;
+            if (filtered.length === 0) return (
+              <div className="rounded-2xl bg-white p-6 text-center text-sm text-muted-foreground">
+                No {planTab === "vip" ? "VIP" : "Normal"} plans yet.
+              </div>
+            );
+            return (
             <div className="space-y-4">
-              {plans.map((p) => (
+              {filtered.map((p) => (
                 <article
                   key={p.id}
                   className="overflow-hidden rounded-3xl bg-white shadow-[0_10px_40px_-12px_rgba(221,29,33,0.18)]"
@@ -205,7 +232,8 @@ function HomePage() {
                 </article>
               ))}
             </div>
-          )}
+            );
+          })()}
         </section>
       </main>
       {confirmPlan && (
