@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import QRCode from "react-qr-code";
-import { MailPlus, CreditCard, Layers, Copy, Check } from "lucide-react";
+import { MailPlus, CreditCard, Layers, Copy, Check, Share2, MessageCircle, Send, Facebook, Sparkles, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { GradientHeader } from "@/components/GradientHeader";
 
@@ -109,13 +109,38 @@ function InvitePage() {
           </div>
         </section>
 
+        {/* Share buttons */}
+        <section>
+          <div className="mb-2 px-1 text-[11px] font-bold tracking-wider text-muted-foreground">SHARE VIA</div>
+          <div className="grid grid-cols-4 gap-2">
+            <ShareBtn icon={MessageCircle} label="WhatsApp" tint="bg-[#25D366]" />
+            <ShareBtn icon={Send}          label="Telegram" tint="bg-[#229ED9]" />
+            <ShareBtn icon={Facebook}      label="Facebook" tint="bg-[#1877F2]" />
+            <ShareBtn icon={Share2}        label="More"     tint="bg-shell-red" />
+          </div>
+        </section>
+
+        {/* Bonus banner */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-shell-red via-shell-red-dark to-[#7a0f12] p-5 text-white shadow-[0_18px_40px_-18px_rgba(221,29,33,0.5)]">
+          <span className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-shell-yellow/25 blur-2xl" />
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/30">
+              <Sparkles size={22} className="text-shell-yellow" />
+            </div>
+            <div className="flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-shell-yellow">Limited Offer</div>
+              <div className="text-base font-extrabold leading-tight">Invite 3 friends today, get <span className="text-shell-yellow">₱150 instant bonus</span></div>
+            </div>
+          </div>
+        </section>
+
         {/* How invitation works */}
         <section className="rounded-3xl bg-white p-5 shadow-[0_8px_30px_-12px_rgba(221,29,33,0.15)]">
           <h2 className="text-sm font-extrabold uppercase tracking-wider text-foreground">How it works</h2>
-          <ol className="mt-2 space-y-2 text-[12px] text-muted-foreground">
-            <li><b className="text-foreground">1.</b> Share your link or code with friends and family.</li>
-            <li><b className="text-foreground">2.</b> They register with your code and start an investment plan.</li>
-            <li><b className="text-foreground">3.</b> You earn commission every time they recharge — automatically.</li>
+          <ol className="mt-3 space-y-3">
+            <Step n={1} title="Share your link or code" desc="Send to friends via WhatsApp, FB or any channel." />
+            <Step n={2} title="They register & invest" desc="Friends sign up using your code and start a plan." />
+            <Step n={3} title="You earn forever" desc="Get commission on every recharge they make — automatically credited." />
           </ol>
         </section>
 
@@ -127,12 +152,38 @@ function InvitePage() {
             <Tier level="Lv2" rate="8%" sub="Sub-team" />
             <Tier level="Lv3" rate="3%" sub="Extended" />
           </div>
-          <p className="mt-3 text-[11px] text-muted-foreground">
-            Commissions credit to your wallet instantly. Build your team to ₱50K and unlock up to <b className="text-shell-red">₱4,000 VIP bonus</b>.
-          </p>
+          <div className="mt-3 flex items-center justify-between rounded-2xl bg-white p-3 ring-1 ring-shell-yellow/30">
+            <div className="text-[11px] text-muted-foreground">
+              Build team to ₱50K → unlock <b className="text-shell-red">₱4,000 VIP bonus</b>
+            </div>
+            <ArrowRight size={14} className="text-shell-red" />
+          </div>
         </section>
       </main>
     </PageShell>
+  );
+}
+
+function ShareBtn({ icon: Icon, label, tint }: { icon: typeof Share2; label: string; tint: string }) {
+  return (
+    <button className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-2.5 ring-1 ring-black/5 shadow-sm active:scale-95">
+      <span className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${tint}`}>
+        <Icon size={18} />
+      </span>
+      <span className="text-[10px] font-bold text-foreground">{label}</span>
+    </button>
+  );
+}
+
+function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
+  return (
+    <li className="flex items-start gap-3">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-shell-red to-shell-red-dark text-xs font-extrabold text-white shadow">{n}</span>
+      <div>
+        <div className="text-sm font-extrabold text-foreground">{title}</div>
+        <div className="text-[11.5px] text-muted-foreground">{desc}</div>
+      </div>
+    </li>
   );
 }
 

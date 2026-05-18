@@ -98,8 +98,8 @@ function ProfilePage() {
                 <span className="rounded-full bg-shell-yellow px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-shell-red-dark">VIP 3</span>
               </div>
               <div className="truncate text-xs text-white/80">ID · 9999988888</div>
-              <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-white/90">
-                <Shield size={11} /> KYC Verified
+              <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-shell-yellow to-[#caa416] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-shell-red-dark shadow ring-1 ring-white/40">
+                <Crown size={10} strokeWidth={2.8} /> VIP Gold Member
               </div>
             </div>
           </div>
