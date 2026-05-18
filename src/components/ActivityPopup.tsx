@@ -92,6 +92,7 @@ export function ActivityPopup() {
   const hidden = pathname.startsWith("/admin") || pathname === "/login" || pathname === "/register";
 
   useEffect(() => {
+    if (hidden) return;
     let hideTimer: ReturnType<typeof setTimeout>;
     let clearTimer: ReturnType<typeof setTimeout>;
 
@@ -110,9 +111,9 @@ export function ActivityPopup() {
       clearTimeout(hideTimer);
       clearTimeout(clearTimer);
     };
-  }, []);
+  }, [hidden]);
 
-  if (!toast) return null;
+  if (hidden || !toast) return null;
   const m = META[toast.kind];
   const Icon = m.Icon;
 
