@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, Check, Gift, Users, Wallet, Share2, TrendingUp, UserPlus, ShieldCheck, ArrowUpRight, Crown } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import shellLogo from "@/assets/shell-logo.png";
+import { useAuth } from "@/lib/auth";
+import { uGet, fmtPeso } from "@/lib/user-api";
 
 export const Route = createFileRoute("/team")({
   head: () => ({
@@ -14,17 +16,42 @@ export const Route = createFileRoute("/team")({
   component: TeamPage,
 });
 
-const REFERRAL_CODE = "SHL821047";
-const REFERRAL_LINK = `https://shelloil-rewards.live/home/register?invite=${REFERRAL_CODE}`;
+interface TeamStats { level: 1 | 2 | 3; count: number; commission: number | string }
 
-const levels = [
-  { n: 1, label: "Level 1", sub: "Direct invites", rate: "15%", rebate: "₱0.00", qty: 7,   dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5" },
-  { n: 2, label: "Level 2", sub: "Sub-team",       rate: "8%",  rebate: "₱0.00", qty: 14,  dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5" },
-  { n: 3, label: "Level 3", sub: "Extended",       rate: "3%",  rebate: "₱0.00", qty: 134, dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5" },
-];
 
 function TeamPage() {
+  const { user } = useAuth();
   const [copied, setCopied] = useState<"code" | "link" | null>(null);
+  const [stats, setStats] = useState<TeamStats[]>([]);
+
+  const REFERRAL_CODE = user?.referral_code || "—";
+  const REFERRAL_LINK = typeof window !== "undefined"
+    ? `${window.location.origin}/register?invite=${REFERRAL_CODE}`
+    : `/register?invite=${REFERRAL_CODE}`;
+
+  useEffect(() => {
+    if (!user) return;
+    uGet<{ ok: true; stats: TeamStats[] }>("/api/u/team")
+      .then((r) => setStats(r.stats || []))
+      .catch(() => setStats([]));
+  }, [user]);
+
+  const styleByLevel = [
+    { dot: "bg-shell-red",   ring: "ring-shell-red/20",   tint: "bg-shell-red/5",   rate: "15%", sub: "Direct invites" },
+    { dot: "bg-shell-amber", ring: "ring-shell-amber/20", tint: "bg-shell-amber/5", rate: "8%",  sub: "Sub-team" },
+    { dot: "bg-shell-green", ring: "ring-shell-green/20", tint: "bg-shell-green/5", rate: "3%",  sub: "Extended" },
+  ];
+  const levels = [1, 2, 3].map((n) => {
+    const s = stats.find((x) => Number(x.level) === n);
+    const st = styleByLevel[n - 1];
+    return {
+      n, label: `Level ${n}`, sub: st.sub, rate: st.rate,
+      rebate: fmtPeso(s?.commission ?? 0),
+      qty: s?.count ?? 0,
+      dot: st.dot, ring: st.ring, tint: st.tint,
+    };
+  });
+
 
   const copy = async (text: string, what: "code" | "link") => {
     try {

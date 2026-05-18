@@ -23,6 +23,9 @@ import {
 import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import shellLogo from "@/assets/shell-logo.png";
+import { useAuth } from "@/lib/auth";
+import { fmtPeso } from "@/lib/user-api";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -49,6 +52,14 @@ const menu = [
 
 function ProfilePage() {
   const [show, setShow] = useState(true);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const displayName = user?.name?.trim() || (user?.phone ? `User ${user.phone.slice(-4)}` : "Guest");
+  const handleLogout = () => {
+    if (!confirm("Sign out of your account?")) return;
+    signOut();
+    navigate({ to: "/login" });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -94,12 +105,12 @@ function ProfilePage() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-lg font-extrabold">Juan D.</span>
-                <span className="rounded-full bg-shell-yellow px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-shell-red-dark">VIP 3</span>
+                <span className="text-lg font-extrabold">{displayName}</span>
+                <span className="rounded-full bg-shell-yellow px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-shell-red-dark">VIP {user?.vip_level ?? 0}</span>
               </div>
-              <div className="truncate text-xs text-white/80">ID · 9999988888</div>
+              <div className="truncate text-xs text-white/80">{user ? `+63 ${user.phone}` : "—"}</div>
               <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-shell-yellow to-[#caa416] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-shell-red-dark shadow ring-1 ring-white/40">
-                <Crown size={10} strokeWidth={2.8} /> VIP Gold Member
+                <Crown size={10} strokeWidth={2.8} /> Code: {user?.referral_code ?? "—"}
               </div>
             </div>
           </div>
@@ -112,7 +123,7 @@ function ProfilePage() {
               <div className="min-w-0 flex-1">
                 <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Account Balance</div>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="truncate text-2xl font-extrabold text-foreground">{show ? "₱2,903.00" : "₱••••••"}</span>
+                  <span className="truncate text-2xl font-extrabold text-foreground">{show ? fmtPeso(user?.balance ?? 0) : "₱••••••"}</span>
                   <button onClick={() => setShow((s) => !s)} aria-label="Toggle balance" className="shrink-0 text-muted-foreground">
                     {show ? <Eye size={16} /> : <EyeOff size={16} />}
                   </button>
@@ -127,9 +138,9 @@ function ProfilePage() {
             </div>
 
             <div className="mt-4 grid grid-cols-3 divide-x divide-border rounded-2xl bg-muted/50 py-3 text-center">
-              <Stat label="Recharge" value="₱9,500" />
-              <Stat label="Withdraw" value="₱5,200" />
-              <Stat label="Welfare" value="₱358" />
+              <Stat label="Recharge" value={fmtPeso(user?.total_recharge ?? 0)} />
+              <Stat label="Withdraw" value={fmtPeso(user?.total_withdraw ?? 0)} />
+              <Stat label="Income" value={fmtPeso(user?.total_income ?? 0)} />
             </div>
           </div>
         </div>
@@ -170,9 +181,9 @@ function ProfilePage() {
           </div>
 
           {/* Exit */}
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-base font-bold text-shell-red ring-1 ring-shell-red/20 active:scale-[0.99]">
+          <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-base font-bold text-shell-red ring-1 ring-shell-red/20 active:scale-[0.99]">
             <LogOut size={18} />
-            Exit App
+            Sign Out
           </button>
         </main>
 

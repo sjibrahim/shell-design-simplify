@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Receipt, ArrowDownLeft, ArrowUpRight, Gift, Wallet } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { uGet, fmtPeso } from "@/lib/user-api";
 
 export const Route = createFileRoute("/transactions")({
   head: () => ({
@@ -13,19 +14,8 @@ export const Route = createFileRoute("/transactions")({
   component: TransactionsPage,
 });
 
-type Tx = { id: string; type: "recharge" | "withdraw" | "income" | "bonus"; amount: number; date: string; status: "success" | "pending" | "failed" };
+type Tx = { id: number | string; type: "recharge" | "withdraw" | "income" | "bonus"; amount: number | string; created_at: string; status: "success" | "pending" | "failed"; note?: string };
 
-const TXS: Tx[] = [
-  { id: "TX24891", type: "income",   amount: 280,   date: "2026-05-18 09:12", status: "success" },
-  { id: "TX24890", type: "bonus",    amount: 400,   date: "2026-05-17 21:04", status: "success" },
-  { id: "TX24875", type: "withdraw", amount: 1500,  date: "2026-05-17 14:33", status: "pending" },
-  { id: "TX24870", type: "recharge", amount: 5000,  date: "2026-05-17 10:21", status: "success" },
-  { id: "TX24852", type: "income",   amount: 280,   date: "2026-05-16 09:10", status: "success" },
-  { id: "TX24840", type: "withdraw", amount: 800,   date: "2026-05-15 18:42", status: "success" },
-  { id: "TX24821", type: "bonus",    amount: 200,   date: "2026-05-14 12:00", status: "success" },
-  { id: "TX24812", type: "recharge", amount: 1000,  date: "2026-05-13 16:55", status: "success" },
-  { id: "TX24800", type: "withdraw", amount: 320,   date: "2026-05-12 11:09", status: "failed"  },
-];
 
 const meta = {
   recharge: { label: "Recharge",  icon: Wallet,         tint: "bg-shell-yellow/30 text-[#8a6500]", sign: "+" },
@@ -42,7 +32,17 @@ const statusStyle = {
 
 function TransactionsPage() {
   const [tab, setTab] = useState<"all" | Tx["type"]>("all");
-  const list = TXS.filter((t) => tab === "all" || t.type === tab);
+  const [items, setItems] = useState<Tx[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    uGet<{ ok: true; items: Tx[] }>("/api/u/transactions")
+      .then((r) => setItems(r.items || []))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const list = items.filter((t) => tab === "all" || t.type === tab);
 
   return (
     <SubPage title="Transactions" icon={<Receipt size={26} className="text-white" />} subtitle="All activity across your account">
@@ -69,11 +69,13 @@ function TransactionsPage() {
         </div>
 
         <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 shadow-sm">
-          {list.length === 0 && (
+          {loading && <div className="px-4 py-10 text-center text-sm text-muted-foreground">Loading…</div>}
+          {!loading && list.length === 0 && (
             <div className="px-4 py-10 text-center text-sm text-muted-foreground">No transactions yet.</div>
           )}
           {list.map((t, i) => {
-            const m = meta[t.type];
+            const m = meta[t.type as Tx["type"]];
+            if (!m) return null;
             const Icon = m.icon;
             return (
               <div
@@ -85,13 +87,13 @@ function TransactionsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-extrabold text-foreground">{m.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{t.date} · {t.id}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">{new Date(t.created_at).toLocaleString()} · #{t.id}</div>
                 </div>
                 <div className="text-right">
                   <div className={`text-sm font-extrabold ${m.sign === "+" ? "text-shell-green" : "text-shell-red"}`}>
-                    {m.sign}₱{t.amount.toLocaleString()}
+                    {m.sign}{fmtPeso(t.amount)}
                   </div>
-                  <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${statusStyle[t.status]}`}>
+                  <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${statusStyle[(t.status as keyof typeof statusStyle) || "success"]}`}>
                     {t.status}
                   </span>
                 </div>

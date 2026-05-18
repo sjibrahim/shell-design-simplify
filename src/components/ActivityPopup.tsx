@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, Wallet, UserPlus, BadgeCheck, X } from "lucide-react";
+import { useRouterState } from "@tanstack/react-router";
 
 type Kind = "purchase" | "recharge" | "invite";
 
@@ -85,10 +86,13 @@ const INTERVAL_MS = 6500;
 const FIRST_DELAY_MS = 2500;
 
 export function ActivityPopup() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [toast, setToast] = useState<Toast | null>(null);
   const [visible, setVisible] = useState(false);
+  const hidden = pathname.startsWith("/admin") || pathname === "/login" || pathname === "/register";
 
   useEffect(() => {
+    if (hidden) return;
     let hideTimer: ReturnType<typeof setTimeout>;
     let clearTimer: ReturnType<typeof setTimeout>;
 
@@ -107,9 +111,9 @@ export function ActivityPopup() {
       clearTimeout(hideTimer);
       clearTimeout(clearTimer);
     };
-  }, []);
+  }, [hidden]);
 
-  if (!toast) return null;
+  if (hidden || !toast) return null;
   const m = META[toast.kind];
   const Icon = m.Icon;
 
