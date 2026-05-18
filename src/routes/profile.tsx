@@ -123,7 +123,7 @@ function ProfilePage() {
               <div className="min-w-0 flex-1">
                 <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Account Balance</div>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="truncate text-2xl font-extrabold text-foreground">{show ? "₱2,903.00" : "₱••••••"}</span>
+                  <span className="truncate text-2xl font-extrabold text-foreground">{show ? fmtPeso(user?.balance ?? 0) : "₱••••••"}</span>
                   <button onClick={() => setShow((s) => !s)} aria-label="Toggle balance" className="shrink-0 text-muted-foreground">
                     {show ? <Eye size={16} /> : <EyeOff size={16} />}
                   </button>
