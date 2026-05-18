@@ -8,10 +8,12 @@ const pool = require('../db');
 const DEFAULTS = {
   WatchPay: {
     payUrl: 'https://api.watchpay.io/api/pay/create',
+    payoutUrl: 'https://api.watchpay.io/api/payout/create',
     notifyPath: '/api/public/watchpay/callback',
   },
   HeyPay: {
     payUrl: 'https://api.heypay.io/api/pay/create',
+    payoutUrl: 'https://api.heypay.io/api/payout/create',
     notifyPath: '/api/public/heypay/callback',
   },
 };
@@ -34,6 +36,7 @@ async function getGatewayConfig(name) {
   return {
     name,
     endpoint,
+    payoutUrl: def.payoutUrl,
     notifyPath: def.notifyPath,
     merchantId: row.merchant_id,
     secret,
@@ -91,4 +94,43 @@ async function createPayment(name, { orderId, amount, notifyUrl, returnUrl }) {
   }
 }
 
-module.exports = { getGatewayConfig, createPayment, md5Sign, verifySign };
+/**
+ * Trigger an outbound payout (withdrawal) through the gateway.
+ * Returns { ok, manual?, ref_no?, raw, error? }.
+ * Falls back to manual mode when creds are placeholders.
+ */
+async function createPayout(name, { orderId, amount, channel, accountNo, accountName, notifyUrl }) {
+  const cfg = await getGatewayConfig(name);
+  if (!cfg) return { ok: false, error: `Gateway ${name} not configured` };
+  if (!cfg.merchantId || !cfg.secret || String(cfg.merchantId).startsWith('REPLACE')) {
+    return { ok: true, manual: true };
+  }
+  const payload = {
+    merchant_id: cfg.merchantId,
+    order_id: String(orderId),
+    amount: Number(amount).toFixed(2),
+    currency: 'PHP',
+    channel: channel || 'GCash',
+    account_no: accountNo || '',
+    account_name: accountName || '',
+    notify_url: notifyUrl || '',
+    timestamp: Math.floor(Date.now() / 1000),
+  };
+  payload.sign = md5Sign(payload, cfg.secret);
+  try {
+    const r = await fetch(cfg.payoutUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json().catch(() => ({}));
+    const code = data.code ?? data.status;
+    const ok = data.success === true || code === 0 || code === '0' || code === 200 || String(data.status || '').toLowerCase() === 'success';
+    if (!ok) return { ok: false, error: data.msg || data.message || 'Payout rejected', raw: data };
+    return { ok: true, ref_no: data.trade_no || data.transaction_id || data.data?.trade_no || null, raw: data };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+module.exports = { getGatewayConfig, createPayment, createPayout, md5Sign, verifySign };
