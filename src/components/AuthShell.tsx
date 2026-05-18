@@ -1,4 +1,4 @@
-import { MapPin, Phone as PhoneIcon, Mail, User as UserIcon, ChevronDown } from "lucide-react";
+import { User as UserIcon, ChevronDown } from "lucide-react";
 import shellLogo from "@/assets/shell-logo.png";
 
 /* =========================================================
