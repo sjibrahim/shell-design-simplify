@@ -236,7 +236,11 @@ export function ResourcePage(p: ResourcePageProps) {
                       className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                     >
                       <option value="">—</option>
-                      {f.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+                      {f.options?.map((o) => {
+                        const value = typeof o === "object" ? o.value : o;
+                        const label = typeof o === "object" ? o.label : o;
+                        return <option key={String(value)} value={value}>{label}</option>;
+                      })}
                     </select>
                   ) : f.type === "textarea" ? (
                     <textarea
