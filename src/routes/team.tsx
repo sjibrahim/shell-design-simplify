@@ -206,9 +206,11 @@ function TeamPage() {
             </div>
 
             {levels.map((lv) => (
-              <div
+              <Link
                 key={lv.n}
-                className="relative overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.18)]"
+                to="/team-view"
+                search={{ level: lv.n }}
+                className="relative block overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.18)] active:scale-[0.99]"
               >
                 <div className={`absolute left-0 top-0 h-full w-1 ${lv.dot}`} />
                 <div className="flex items-center justify-between gap-3 pl-2">
@@ -223,16 +225,16 @@ function TeamPage() {
                       <div className="truncate text-[11px] font-semibold text-muted-foreground">{lv.sub}</div>
                     </div>
                   </div>
-                  <button className="flex shrink-0 items-center gap-0.5 rounded-full bg-shell-red/10 px-2.5 py-1 text-[11px] font-bold text-shell-red active:scale-95">
+                  <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-shell-red/10 px-2.5 py-1 text-[11px] font-bold text-shell-red">
                     Details <ArrowUpRight size={12} />
-                  </button>
+                  </span>
                 </div>
                 <div className={`mt-3 grid grid-cols-3 overflow-hidden rounded-xl ${lv.tint} divide-x divide-white`}>
                   <Cell value={lv.rate} label="Rebate" accent />
                   <Cell value={lv.rebate} label="Earned" />
                   <Cell value={lv.qty.toString()} label="Members" />
                 </div>
-              </div>
+              </Link>
             ))}
           </section>
         </main>
