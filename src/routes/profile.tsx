@@ -23,6 +23,9 @@ import {
 import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import shellLogo from "@/assets/shell-logo.png";
+import { useAuth } from "@/lib/auth";
+import { fmtPeso } from "@/lib/user-api";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
