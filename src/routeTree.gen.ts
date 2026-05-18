@@ -23,6 +23,7 @@ import { Route as RechargeRouteImport } from './routes/recharge'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MissionRouteImport } from './routes/mission'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as IncomeDetailsRouteImport } from './routes/income-details'
 import { Route as ChannelRouteImport } from './routes/channel'
@@ -101,6 +102,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InviteRoute = InviteRouteImport.update({
   id: '/invite',
   path: '/invite',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
   '/invite': typeof InviteRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mission': typeof MissionRoute
   '/profile': typeof ProfileRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/channel'
     | '/income-details'
     | '/invite'
+    | '/leaderboard'
     | '/login'
     | '/mission'
     | '/profile'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/channel'
     | '/income-details'
     | '/invite'
+    | '/leaderboard'
     | '/login'
     | '/mission'
     | '/profile'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/channel'
     | '/income-details'
     | '/invite'
+    | '/leaderboard'
     | '/login'
     | '/mission'
     | '/profile'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   ChannelRoute: typeof ChannelRoute
   IncomeDetailsRoute: typeof IncomeDetailsRoute
   InviteRoute: typeof InviteRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MissionRoute: typeof MissionRoute
   ProfileRoute: typeof ProfileRoute
@@ -403,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invite': {
       id: '/invite'
       path: '/invite'
@@ -463,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChannelRoute: ChannelRoute,
   IncomeDetailsRoute: IncomeDetailsRoute,
   InviteRoute: InviteRoute,
+  LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MissionRoute: MissionRoute,
   ProfileRoute: ProfileRoute,
