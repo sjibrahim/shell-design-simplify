@@ -28,9 +28,12 @@ import { Route as InviteRouteImport } from './routes/invite'
 import { Route as IncomeDetailsRouteImport } from './routes/income-details'
 import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as AppDownloadRouteImport } from './routes/app-download'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AddBankRouteImport } from './routes/add-bank'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 
 const WithdrawalsRoute = WithdrawalsRouteImport.update({
   id: '/withdrawals',
@@ -127,6 +130,11 @@ const AppDownloadRoute = AppDownloadRouteImport.update({
   path: '/app-download',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AddBankRoute = AddBankRouteImport.update({
   id: '/add-bank',
   path: '/add-bank',
@@ -142,11 +150,22 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/add-bank': typeof AddBankRoute
+  '/admin': typeof AdminRouteWithChildren
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -166,6 +185,8 @@ export interface FileRoutesByFullPath {
   '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
   '/withdrawals': typeof WithdrawalsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,12 +211,15 @@ export interface FileRoutesByTo {
   '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
   '/withdrawals': typeof WithdrawalsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/add-bank': typeof AddBankRoute
+  '/admin': typeof AdminRouteWithChildren
   '/app-download': typeof AppDownloadRoute
   '/channel': typeof ChannelRoute
   '/income-details': typeof IncomeDetailsRoute
@@ -215,6 +239,8 @@ export interface FileRoutesById {
   '/vip-bonus': typeof VipBonusRoute
   '/withdraw': typeof WithdrawRoute
   '/withdrawals': typeof WithdrawalsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -222,6 +248,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/add-bank'
+    | '/admin'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -241,6 +268,8 @@ export interface FileRouteTypes {
     | '/vip-bonus'
     | '/withdraw'
     | '/withdrawals'
+    | '/admin/login'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -265,11 +294,14 @@ export interface FileRouteTypes {
     | '/vip-bonus'
     | '/withdraw'
     | '/withdrawals'
+    | '/admin/login'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/add-bank'
+    | '/admin'
     | '/app-download'
     | '/channel'
     | '/income-details'
@@ -289,12 +321,15 @@ export interface FileRouteTypes {
     | '/vip-bonus'
     | '/withdraw'
     | '/withdrawals'
+    | '/admin/login'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AddBankRoute: typeof AddBankRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AppDownloadRoute: typeof AppDownloadRoute
   ChannelRoute: typeof ChannelRoute
   IncomeDetailsRoute: typeof IncomeDetailsRoute
@@ -451,6 +486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/add-bank': {
       id: '/add-bank'
       path: '/add-bank'
@@ -472,13 +514,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminLoginRoute: AdminLoginRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AddBankRoute: AddBankRoute,
+  AdminRoute: AdminRouteWithChildren,
   AppDownloadRoute: AppDownloadRoute,
   ChannelRoute: ChannelRoute,
   IncomeDetailsRoute: IncomeDetailsRoute,
