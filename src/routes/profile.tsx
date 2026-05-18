@@ -138,9 +138,9 @@ function ProfilePage() {
             </div>
 
             <div className="mt-4 grid grid-cols-3 divide-x divide-border rounded-2xl bg-muted/50 py-3 text-center">
-              <Stat label="Recharge" value="₱9,500" />
-              <Stat label="Withdraw" value="₱5,200" />
-              <Stat label="Welfare" value="₱358" />
+              <Stat label="Recharge" value={fmtPeso(user?.total_recharge ?? 0)} />
+              <Stat label="Withdraw" value={fmtPeso(user?.total_withdraw ?? 0)} />
+              <Stat label="Income" value={fmtPeso(user?.total_income ?? 0)} />
             </div>
           </div>
         </div>
