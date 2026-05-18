@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Layers, TrendingUp, Wallet, Calendar, Gift, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ChevronLeft, Layers, TrendingUp, Wallet, Calendar, Gift, ArrowUpRight } from "lucide-react";
 
 export const Route = createFileRoute("/income-details")({
   head: () => ({
