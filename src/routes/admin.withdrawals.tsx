@@ -44,7 +44,26 @@ function WithdrawalsPage() {
       ]}
       renderRowActions={(row, reload) => row.status === "pending" || row.status === "processing" ? (
         <>
-          <button onClick={async () => { await apiPut(`/api/withdrawals/${row.id}`, { status: "success" }); toast.success("Withdrawal approved"); reload(); }} className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50" title="Approve"><CheckCircle size={14} /></button>
+          <button
+            onClick={async () => { await apiPut(`/api/withdrawals/${row.id}`, { status: "success", payout_via: "manual" }); toast.success("Approved (manual)"); reload(); }}
+            className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50" title="Approve manually (mark paid)"
+          ><CheckCircle size={14} /></button>
+          <button
+            onClick={async () => {
+              try { const r = await apiPut<{ ok: true; payout?: { manual?: boolean; ref_no?: string } }>(`/api/withdrawals/${row.id}`, { status: "success", payout_via: "WatchPay" });
+                toast.success(r.payout?.manual ? "WatchPay queued (manual mode)" : "Sent to WatchPay"); reload();
+              } catch (e) { toast.error((e as Error).message); }
+            }}
+            className="rounded p-1.5 text-rose-600 hover:bg-rose-50" title="Pay via WatchPay"
+          ><Zap size={14} /></button>
+          <button
+            onClick={async () => {
+              try { const r = await apiPut<{ ok: true; payout?: { manual?: boolean; ref_no?: string } }>(`/api/withdrawals/${row.id}`, { status: "success", payout_via: "HeyPay" });
+                toast.success(r.payout?.manual ? "HeyPay queued (manual mode)" : "Sent to HeyPay"); reload();
+              } catch (e) { toast.error((e as Error).message); }
+            }}
+            className="rounded p-1.5 text-indigo-600 hover:bg-indigo-50" title="Pay via HeyPay"
+          ><Wallet size={14} /></button>
           <button onClick={async () => { await apiPut(`/api/withdrawals/${row.id}`, { status: "failed" }); toast.success("Withdrawal failed and refunded"); reload(); }} className="rounded p-1.5 text-rose-600 hover:bg-rose-50" title="Fail & refund"><XCircle size={14} /></button>
         </>
       ) : null}
