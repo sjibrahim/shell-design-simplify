@@ -15,6 +15,10 @@ import {
   EyeOff,
   Plus,
   ArrowUpRight,
+  Crown,
+  Receipt,
+  Landmark,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
@@ -31,10 +35,14 @@ export const Route = createFileRoute("/profile")({
 });
 
 const menu = [
-  { icon: Building2, label: "About Company", desc: "Shell Pilipinas overview", to: "/about" },
+  { icon: Crown, label: "VIP Bonus", desc: "Team milestones & rewards", to: "/vip-bonus" },
+  { icon: Users, label: "View Team", desc: "All members & levels", to: "/team-view" },
+  { icon: Receipt, label: "Transactions", desc: "All account activity", to: "/transactions" },
+  { icon: ArrowDownToLine, label: "Withdrawals", desc: "Payout history", to: "/withdrawals" },
+  { icon: Landmark, label: "Bank Accounts", desc: "Manage payout methods", to: "/add-bank" },
   { icon: FileText, label: "Income Record", desc: "Daily earnings history", to: "/income-details" },
-  { icon: ArrowDownToLine, label: "Withdraw Record", desc: "Bank transfer history", to: "/withdraw" },
   { icon: Ticket, label: "Redeem Code", desc: "Use a promo code", to: "/redeem" },
+  { icon: Building2, label: "About Company", desc: "Shell Pilipinas overview", to: "/about" },
   { icon: Download, label: "App Download", desc: "Get the latest version", to: "/app-download" },
 ] as const;
 

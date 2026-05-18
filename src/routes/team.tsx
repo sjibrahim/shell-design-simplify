@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Copy, Check, Gift, Users, Wallet, Share2, TrendingUp, UserPlus, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { Copy, Check, Gift, Users, Wallet, Share2, TrendingUp, UserPlus, ShieldCheck, ArrowUpRight, Crown } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import shellLogo from "@/assets/shell-logo.png";
 
@@ -133,18 +133,34 @@ function TeamPage() {
             </div>
           </section>
 
+          {/* VIP Bonus + Members hero */}
+          <Link
+            to="/vip-bonus"
+            className="relative flex items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-shell-red to-shell-red-dark p-4 text-white shadow-md ring-1 ring-white/20 active:scale-[0.99]"
+          >
+            <span className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-shell-yellow/30 blur-2xl" />
+            <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/30 backdrop-blur">
+              <Crown size={20} />
+            </span>
+            <span className="relative flex-1">
+              <span className="block text-sm font-extrabold">VIP Team Bonus</span>
+              <span className="block text-[11px] text-white/85">Earn up to ₱4,000 on ₱50K team invest</span>
+            </span>
+            <span className="relative rounded-full bg-shell-yellow px-2.5 py-1 text-[10px] font-extrabold text-shell-red-dark">HOT</span>
+          </Link>
+
           {/* Quick actions */}
           <section className="grid grid-cols-2 gap-3">
-            <button className="flex items-center justify-between rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-sm active:scale-[0.98]">
+            <Link to="/team-view" className="flex items-center justify-between rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-sm active:scale-[0.98]">
               <div className="text-left">
-                <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Today</div>
-                <div className="text-base font-extrabold text-foreground">+12 joined</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Members</div>
+                <div className="text-base font-extrabold text-foreground">View Team</div>
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-shell-green/15 text-shell-green">
                 <UserPlus size={18} />
               </div>
-            </button>
-            <button className="flex items-center justify-between rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-sm active:scale-[0.98]">
+            </Link>
+            <Link to="/transactions" className="flex items-center justify-between rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-sm active:scale-[0.98]">
               <div className="text-left">
                 <div className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">This Week</div>
                 <div className="text-base font-extrabold text-foreground">₱1,245</div>
@@ -152,7 +168,7 @@ function TeamPage() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-shell-yellow/30 text-[#8a6500]">
                 <Wallet size={18} />
               </div>
-            </button>
+            </Link>
           </section>
 
           {/* Levels */}
