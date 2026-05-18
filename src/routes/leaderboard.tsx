@@ -92,6 +92,18 @@ function LeaderboardPage() {
           })}
         </div>
 
+        {/* Live countdown bar */}
+        <div className="flex items-center justify-between rounded-2xl bg-white p-3 ring-1 ring-black/5 shadow-sm">
+          <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground">
+            <Timer size={14} className="text-shell-red" /> Season ends in
+          </div>
+          <div className="flex items-center gap-1 font-mono text-[12px] font-extrabold text-shell-red">
+            <span className="rounded-md bg-shell-red/10 px-1.5 py-0.5">12d</span>
+            <span className="rounded-md bg-shell-red/10 px-1.5 py-0.5">08h</span>
+            <span className="rounded-md bg-shell-red/10 px-1.5 py-0.5">43m</span>
+          </div>
+        </div>
+
         {/* Podium */}
         <div className="grid grid-cols-3 items-end gap-2">
           {[top3[1], top3[0], top3[2]].map((p, idx) => {
@@ -106,11 +118,21 @@ function LeaderboardPage() {
             }[p.rank as 1 | 2 | 3];
             return (
               <div key={p.rank} className={`flex flex-col items-center ${idx === 1 ? "order-2" : idx === 0 ? "order-1" : "order-3"}`}>
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${tones} text-white shadow-md`}>
-                  <Icon size={22} />
+                <div className="relative">
+                  <div className={`flex items-center justify-center rounded-full bg-gradient-to-br ${tones} p-1 shadow-lg ${isFirst ? "h-20 w-20" : "h-16 w-16"}`}>
+                    <img src={avatarUrl(p.seed)} alt={p.name} className={`rounded-full bg-white object-cover ${isFirst ? "h-[72px] w-[72px]" : "h-[56px] w-[56px]"}`} />
+                  </div>
+                  <div className={`absolute -top-2 left-1/2 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-br ${tones} text-white shadow ring-2 ring-white`}>
+                    <Icon size={14} strokeWidth={2.6} />
+                  </div>
+                  {isFirst && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-shell-red px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wide text-white shadow ring-2 ring-white">
+                      Champion
+                    </span>
+                  )}
                 </div>
-                <div className="mt-1 text-xs font-extrabold text-foreground">{p.name}</div>
-                <div className="text-[10px] text-muted-foreground">₱{p.earned.toLocaleString()}</div>
+                <div className="mt-2.5 text-xs font-extrabold text-foreground">{p.name}</div>
+                <div className="text-[10px] font-bold text-shell-green">₱{p.earned.toLocaleString()}</div>
                 <div className={`mt-1.5 flex w-full items-center justify-center rounded-t-xl bg-gradient-to-b ${tones} ${heights} text-2xl font-black text-white shadow-inner`}>
                   {p.rank}
                 </div>
@@ -123,22 +145,36 @@ function LeaderboardPage() {
         <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 shadow-sm">
           {rest.map((r, i) => {
             const isYou = r.name === "Juan D.";
+            const movement = (r.rank * 7) % 5 - 2; // fake delta -2..+2
             return (
               <div
                 key={r.rank}
-                className={`flex items-center gap-3 px-4 py-3 ${i !== rest.length - 1 ? "border-b border-border" : ""} ${isYou ? "bg-shell-yellow-soft/50" : ""}`}
+                className={`flex items-center gap-3 px-3.5 py-3 ${i !== rest.length - 1 ? "border-b border-border" : ""} ${isYou ? "bg-shell-yellow-soft/60" : ""}`}
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-extrabold text-foreground">
+                <div className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-extrabold ${isYou ? "bg-shell-red text-white" : "bg-muted text-foreground"}`}>
                   {r.rank}
+                </div>
+                <div className="relative shrink-0">
+                  <img src={avatarUrl(r.seed)} alt={r.name} className="h-10 w-10 rounded-full bg-muted object-cover ring-2 ring-white shadow-sm" />
+                  {isYou && <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-shell-green ring-2 ring-white" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 text-sm font-extrabold text-foreground">
-                    {r.name} {isYou && <span className="rounded-full bg-shell-red px-2 py-0.5 text-[9px] font-bold text-white">YOU</span>}
+                    {r.name}
+                    {isYou && <span className="rounded-full bg-shell-red px-2 py-0.5 text-[9px] font-bold text-white">YOU</span>}
                   </div>
-                  <div className="text-[11px] text-muted-foreground">{r.team} members</div>
+                  <div className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
+                    <Users size={10} /> {r.team} members
+                    <span className={`ml-1 rounded-full px-1.5 font-bold ${movement > 0 ? "bg-shell-green/15 text-shell-green" : movement < 0 ? "bg-shell-red/10 text-shell-red" : "bg-muted text-muted-foreground"}`}>
+                      {movement > 0 ? `▲${movement}` : movement < 0 ? `▼${Math.abs(movement)}` : "—"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-sm font-extrabold text-shell-green">
-                  <TrendingUp size={12} /> ₱{r.earned.toLocaleString()}
+                <div className="text-right">
+                  <div className="flex items-center justify-end gap-1 text-sm font-extrabold text-shell-green">
+                    <TrendingUp size={11} /> ₱{r.earned.toLocaleString()}
+                  </div>
+                  <div className="text-[9.5px] font-bold uppercase tracking-wide text-muted-foreground">earned</div>
                 </div>
               </div>
             );
