@@ -105,12 +105,12 @@ function ProfilePage() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-lg font-extrabold">Juan D.</span>
-                <span className="rounded-full bg-shell-yellow px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-shell-red-dark">VIP 3</span>
+                <span className="text-lg font-extrabold">{displayName}</span>
+                <span className="rounded-full bg-shell-yellow px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-shell-red-dark">VIP {user?.vip_level ?? 0}</span>
               </div>
-              <div className="truncate text-xs text-white/80">ID · 9999988888</div>
+              <div className="truncate text-xs text-white/80">{user ? `+63 ${user.phone}` : "—"}</div>
               <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-shell-yellow to-[#caa416] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-shell-red-dark shadow ring-1 ring-white/40">
-                <Crown size={10} strokeWidth={2.8} /> VIP Gold Member
+                <Crown size={10} strokeWidth={2.8} /> Code: {user?.referral_code ?? "—"}
               </div>
             </div>
           </div>
