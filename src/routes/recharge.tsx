@@ -36,7 +36,12 @@ function RechargePage() {
     if (!amt || amt < 100) { toast.error("Minimum recharge is ₱100"); return; }
     setLoading(true);
     try {
-      await uPost("/api/u/recharge", { amount: amt, gateway: method });
+      const r = await uPost<{ ok: true; id: number; pay_url?: string | null }>("/api/u/recharge", { amount: amt, gateway: method });
+      if (r.pay_url) {
+        toast.success("Redirecting to payment…");
+        window.location.href = r.pay_url;
+        return;
+      }
       toast.success("Recharge request submitted", { description: "Awaiting admin confirmation." });
       navigate({ to: "/transactions" });
     } catch (e) { toast.error((e as Error).message); }
