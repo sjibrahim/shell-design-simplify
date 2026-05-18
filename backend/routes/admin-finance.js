@@ -144,17 +144,15 @@ withdrawals.post('/', async (req, res) => {
 
 withdrawals.put('/:id', async (req, res) => {
   const id = req.params.id;
-  const [rows] = await pool.query('SELECT * FROM withdrawals WHERE id = ?', [id]);
-  const row = rows[0];
-  if (!row) return res.status(404).json({ error: 'Not found' });
-
-  const newStatus = req.body.status || row.status;
-  const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
-  const newNote = req.body.note !== undefined ? req.body.note : row.note;
-
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    const [rows] = await conn.query('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
+    const row = rows[0];
+    if (!row) { await conn.rollback(); return res.status(404).json({ error: 'Not found' }); }
+    const newStatus = req.body.status || row.status;
+    const newRef = req.body.ref_no !== undefined ? req.body.ref_no : row.ref_no;
+    const newNote = req.body.note !== undefined ? req.body.note : row.note;
     await conn.query(
       'UPDATE withdrawals SET status=?, ref_no=?, note=? WHERE id=?',
       [newStatus, newRef, newNote, id]
