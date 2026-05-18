@@ -78,7 +78,7 @@ function HomePage() {
   return (
     <PageShell>
       {/* Top header */}
-      <header className="relative overflow-hidden rounded-b-[2.5rem] bg-[linear-gradient(135deg,#DD1D21_0%,#A8161A_100%)] px-5 pb-28 pt-6 text-white">
+      <header className="relative overflow-hidden rounded-b-[2.5rem] bg-[linear-gradient(135deg,#DD1D21_0%,#A8161A_100%)] px-5 pb-20 pt-6 text-white">
         <span className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
         <span className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-shell-yellow/10" />
         <div className="relative flex items-center gap-3">
