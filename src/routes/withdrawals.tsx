@@ -47,7 +47,7 @@ const RECORDS: Record[] = [
   { id: "WD8770", amount: 500,  fee: 10, net: 490,  bank: "GCash · 0912xxx7821", bankIcon: "G", date: "2026-05-02 09:21", status: "success", ref: "TXN-2A3877" },
 ];
 
-const statusMeta: Record["status"] extends infer _ ? { [K in Status]: { tint: string; ring: string; icon: typeof Check; label: string } } : never = {
+const statusMeta: { [K in Status]: { tint: string; ring: string; icon: typeof Check; label: string } } = {
   success: { tint: "bg-shell-green/15 text-shell-green", ring: "ring-shell-green/30", icon: Check, label: "Paid" },
   pending: { tint: "bg-shell-yellow/30 text-[#8a6500]",   ring: "ring-shell-yellow/50", icon: Clock, label: "Processing" },
   failed:  { tint: "bg-shell-red/10 text-shell-red",       ring: "ring-shell-red/30",    icon: X,     label: "Failed" },
