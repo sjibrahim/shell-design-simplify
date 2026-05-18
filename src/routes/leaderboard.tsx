@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trophy, Crown, Medal, Flame, TrendingUp, Sparkles } from "lucide-react";
+import { Trophy, Crown, Medal, Flame, TrendingUp, Sparkles, Timer, Users } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
 
 export const Route = createFileRoute("/leaderboard")({
