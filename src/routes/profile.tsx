@@ -181,9 +181,9 @@ function ProfilePage() {
           </div>
 
           {/* Exit */}
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-base font-bold text-shell-red ring-1 ring-shell-red/20 active:scale-[0.99]">
+          <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-base font-bold text-shell-red ring-1 ring-shell-red/20 active:scale-[0.99]">
             <LogOut size={18} />
-            Exit App
+            Sign Out
           </button>
         </main>
 
