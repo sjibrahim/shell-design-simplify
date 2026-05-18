@@ -6,6 +6,7 @@ const pool = require('../db');
 const { authRequired } = require('../middleware/auth');
 const { paginate } = require('../middleware/helpers');
 const { creditUplineCommissions } = require('../lib/commission');
+const { createPayout } = require('../lib/payment-gateways');
 
 // --- Recharges ---
 const recharges = express.Router();
