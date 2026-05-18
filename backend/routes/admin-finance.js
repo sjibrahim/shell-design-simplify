@@ -208,6 +208,7 @@ recharges.post('/bulk/status', async (req, res) => {
       if (wasOpen && status === 'success') {
         await conn.query('UPDATE users SET balance = balance + ?, total_recharge = total_recharge + ? WHERE id=?', [row.amount, row.amount, row.user_id]);
         await conn.query(`UPDATE transactions SET status='success' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
+        await creditUplineCommissions(conn, { userId: row.user_id, amount: Number(row.amount), rechargeId: Number(id) });
       }
       if (wasOpen && status === 'failed') {
         await conn.query(`UPDATE transactions SET status='failed' WHERE user_id=? AND type='recharge' AND note=? LIMIT 1`, [row.user_id, `Recharge #${id}`]);
