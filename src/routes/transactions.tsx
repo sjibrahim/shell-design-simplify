@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Receipt, ArrowDownLeft, ArrowUpRight, Gift, Wallet } from "lucide-react";
 import { SubPage } from "@/components/SubPage";
+import { uGet, fmtPeso } from "@/lib/user-api";
 
 export const Route = createFileRoute("/transactions")({
   head: () => ({
@@ -13,19 +14,8 @@ export const Route = createFileRoute("/transactions")({
   component: TransactionsPage,
 });
 
-type Tx = { id: string; type: "recharge" | "withdraw" | "income" | "bonus"; amount: number; date: string; status: "success" | "pending" | "failed" };
+type Tx = { id: number | string; type: "recharge" | "withdraw" | "income" | "bonus"; amount: number | string; created_at: string; status: "success" | "pending" | "failed"; note?: string };
 
-const TXS: Tx[] = [
-  { id: "TX24891", type: "income",   amount: 280,   date: "2026-05-18 09:12", status: "success" },
-  { id: "TX24890", type: "bonus",    amount: 400,   date: "2026-05-17 21:04", status: "success" },
-  { id: "TX24875", type: "withdraw", amount: 1500,  date: "2026-05-17 14:33", status: "pending" },
-  { id: "TX24870", type: "recharge", amount: 5000,  date: "2026-05-17 10:21", status: "success" },
-  { id: "TX24852", type: "income",   amount: 280,   date: "2026-05-16 09:10", status: "success" },
-  { id: "TX24840", type: "withdraw", amount: 800,   date: "2026-05-15 18:42", status: "success" },
-  { id: "TX24821", type: "bonus",    amount: 200,   date: "2026-05-14 12:00", status: "success" },
-  { id: "TX24812", type: "recharge", amount: 1000,  date: "2026-05-13 16:55", status: "success" },
-  { id: "TX24800", type: "withdraw", amount: 320,   date: "2026-05-12 11:09", status: "failed"  },
-];
 
 const meta = {
   recharge: { label: "Recharge",  icon: Wallet,         tint: "bg-shell-yellow/30 text-[#8a6500]", sign: "+" },
