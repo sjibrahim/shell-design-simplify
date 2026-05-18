@@ -1,65 +1,58 @@
-# Shell Oil — Referral App (Static Demo)
+## Scope
 
-A mobile-first, 3-screen referral/earnings app modeled on the uploaded references, rebranded to Shell Oil with a yellow + red color system.
+Aapne 4 cheezein boli — ye plan unhi pe deliver karega:
 
-## Screens
+### 1. Home page (`src/routes/index.tsx`)
+- "Wallet Balance" card pura remove karna (red header ke andar wala white/glass card).
+- Investment Plans section me **Normal / VIP** ke do tabs add karne — top pe pill toggle.
+- Selected tab ke hisab se plans filter karke dikhana.
 
-1. **Profile** (`/profile`, default route)
-   - Gradient header: Shell ID, "VIP Member" badge, Shell logo tile
-   - Stats card: Balance / Recharged / Total Income (₱ values)
-   - Recharge + Withdraw action row
-   - "My Account" list: My Orders, Bank Account, Transaction Records, About Company
+### 2. Plans schema + API
+- `plans` table me naya column: `type ENUM('normal','vip') NOT NULL DEFAULT 'normal'` — migration ke through.
+- User endpoint `/api/u/plans` me `?type=normal|vip` filter support.
+- Admin `/api/admin/plans` me `type` field create/update support (admin form me dropdown).
+- Existing plans me sab `'normal'` default ho jayenge — VIP plans admin se add karne padenge.
 
-2. **Team** (`/team`)
-   - Header: "My Team — Track your referral network & earnings"
-   - Two top cards: Total Team, Team Recharge
-   - Lv1 / Lv2 / Lv3 tabs with counts and earnings
-   - Team Members list with Level 1/2/3 segmented tabs and member cards (masked phone, date, total recharge/withdraw)
+### 3. Team page (`src/routes/team.tsx` + `src/routes/team-view.tsx`)
+- Backend `/api/u/team` already L1/L2/L3 me members + stats return karta hai — bas frontend dikha nahi raha.
+- Team page pe har level card pe "Details" button `team-view?level=1` jaisa link karega.
+- `team-view.tsx` me 3 tabs (L1 / L2 / L3) banake har level ke real members (phone, name, total_recharge, status, created_at) list karega — backend ke `l1.users / l2.users / l3.users` se.
+- "Total Rebate" / commission abhi backend me 0 hai (commission logic exist nahi karta) — sirf member count + total recharge dikhayenge. Commission rule baad me alag se.
 
-3. **Invite** (`/invite`)
-   - Header: "Invite Friends — Earn commissions on every referral"
-   - 3 stat cards: Total Invited / Earned / Levels
-   - QR code card (generated with `qrcode` lib from referral link)
-   - Referral Link with Copy button, Referral Code
+### 4. Admin (`Admin.php` se alignment)
+Admin.php CodeIgniter PHP hai jisme views + JSON endpoints mixed hain. Hum already Express + React me hain, to "complete rewrite" ka realistic matlab: **jo Admin.php me functions hain aur humare yaha missing hain, woh add karna**. Mapping:
 
-Persistent bottom nav: Home (disabled placeholder), Invite, Team, Profile.
+| Admin.php function | Status |
+|---|---|
+| login / logout / index / profile | ✅ exists (`admin.login.tsx`, JWT) |
+| users / inactive_users / add_user / insert_user / update_account / remove_user | ✅ exists (`admin.members.tsx` + `users.js`) |
+| products (plans) | ✅ exists — `type` field add karenge |
+| giftcards / redeem codes | ✅ exists (`admin.redeem-codes.tsx`) |
+| single_reward / add_reward / agent_record | ✅ exists (`admin.rewards.tsx`) |
+| gateways | ✅ exists |
+| sliders | ❌ **add** — `sliders` table + `admin.sliders.tsx` |
+| credit_transactions / debit_transactions / transactions | ✅ exists, par credit/debit split filter add karenge |
+| withdraw / blogger_withdraw / usdt_withdraw | partial — `withdrawals` exists, `blogger`/`usdt` ke liye `kind` filter add karenge (`payouts` already has it for blogger) |
+| settings / sliders settings | ✅ exists |
+| generic add/update/get/remove (table CRUD) | `_crud.js` already hai |
 
-## Design system (Shell branding)
+Admin sidebar me **"Sliders"** ka naya nav item bhi add hoga.
 
-- Primary: Shell Yellow `#FFD500`
-- Accent: Shell Red `#DD1D21`
-- Header gradient: red → deeper red (`#DD1D21` → `#A8161A`) with soft circle motifs
-- Background: warm off-white `#FFFBF0`
-- Card surface: white with soft yellow-tinted shadow
-- Same rounded-2xl cards, icon tiles, dividers, and typographic hierarchy as references
-- Icon tiles re-tinted: yellow, red, amber, green variants (kept for variety)
-- All values stay as static mock data (₱2,903 balance, 155 team, etc.)
+## Out of scope (alag turn me karenge agar chaho)
+- Watchpay / Heypay payment gateway PHP code ko Node me port karna (callbacks, signatures) — alag effort hai, payment flow change karega.
+- Commission/rebate calculation engine (L1=15%, L2=8%, L3=3% jaise rates) — backend me earnings ka source-of-truth banana padega.
+- Admin profile photo, admin password change UI etc. cosmetic chizein.
 
-## Tech notes
+## Files touched
+- `backend/migrate.js` (new migration: plans.type, sliders table)
+- `backend/routes/users-public.js` (plans filter)
+- `backend/routes/admin-finance.js` ya `_crud.js` (plans type, sliders, withdraw kind filter)
+- `src/routes/index.tsx` (wallet card remove + Normal/VIP tabs)
+- `src/routes/team.tsx` (Details links)
+- `src/routes/team-view.tsx` (L1/L2/L3 tabs with real members)
+- `src/routes/admin.plans.tsx` (type dropdown)
+- `src/routes/admin.sliders.tsx` (NEW)
+- `src/components/AdminLayout.tsx` (Sliders nav)
+- `src/components/PageShell.tsx` (agar wallet card wahan hai — check karenge)
 
-- TanStack Start template (current artifact stack)
-- Routes via existing router; mobile viewport set automatically
-- `qrcode` (or `react-qr-code`) for the QR
-- Lucide icons (Wallet, CreditCard, Users, UserPlus, ShoppingBag, Landmark, FileText, Building2, Home, Copy, ChevronRight)
-- Tailwind tokens defined in `index.css` / tailwind config; no Cloud, no auth
-
-## File plan
-
-```text
-src/
-  routes/
-    profile.tsx        # default redirect target
-    team.tsx
-    invite.tsx
-  components/
-    BottomNav.tsx
-    GradientHeader.tsx
-    StatCard.tsx
-    AccountRow.tsx
-    LevelTabs.tsx
-  assets/
-    shell-logo.png     # generated Shell-style logo
-  index.css            # Shell color tokens
-```
-
-Closing: I'll deliver a polished static demo — no backend, no live data.
+Confirm karo to start kar du, ya kuch adjust karna hai?
